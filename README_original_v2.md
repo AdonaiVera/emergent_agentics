@@ -125,7 +125,9 @@ Arguments taken by `run_backend_automatic.sh`:
 
 Example:
 ```bash
-    ./run_backend_automatic.sh --conda_path /opt/anaconda3/bin/activate --env_name simulacra -o base_the_ville_isabella_maria_klaus -t test_1 -s 4 --ui True
+    ./run_backend_automatic.sh --conda_path /opt/anaconda3/bin/activate --env_name simulacra -o base_party -t test_1 -s 4 --ui True
+
+
 ```
 
 ### Endpoint list
