@@ -64,6 +64,44 @@ The party environment is modeled as a tree-structured space with distinct zones:
 - Information sharing through whisper function
 - Social group formation
 
+## Setting Up The Environment
+
+### Step 1. Conda Env
+
+Note: If you change the environment name from `simulacra`, you'll need to update the name in the upcoming bash scripts as well.
+```bash
+    conda create -n simulacra python=3.9.12 pip
+    conda activate simulacra
+    pip install -r requirements.txt
+```
+
+
+## Run Simulations
+
+All of the following scripts accept two optional arguments to customize the conda setup:
+- `--conda_path`: Path to your conda activate script (default: `/home/${USER}/anaconda3/bin/activate`)
+- `--env_name`: Name of the conda environment to use (default: `simulacra`)
+
+Example with custom conda setup:
+```bash
+./run_frontend.sh --conda_path /opt/anaconda3/bin/activate --env_name simulacra
+```
+
+
+Example:
+```bash
+    ./run_backend_automatic.sh --conda_path /opt/anaconda3/bin/activate --env_name simulacra -o base_party -t test_1 -s 4 --ui True
+```
+
+
+### Endpoint list
+- [http://localhost:8000/](http://localhost:8000/) - check if the server is running
+- [http://localhost:8000/simulator_home](http://localhost:8000/simulator_home) - watch the live simulation
+- `http://localhost:8000/replay/<simulation-name>/<starting-time-step>` - replay a simulation
+
+For a more detailed explanation see the [original readme](README_origin.md).
+
+
 
 ## Authors
 This project was developed as part of the Complex Systems course under the guidance of Professor Ali A. Minai.
