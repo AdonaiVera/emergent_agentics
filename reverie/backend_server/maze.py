@@ -203,6 +203,7 @@ class Maze:
     # self.address_tiles['<spawn_loc>bedroom-2-a'] == {(58, 9)}
     # self.address_tiles['double studio:recreation:pool table'] 
     #   == {(29, 14), (31, 11), (30, 14), (32, 11), ...}, 
+
     self.address_tiles = dict()
     for i in range(self.maze_height):
       for j in range(self.maze_width): 
@@ -309,6 +310,27 @@ class Maze:
       path += f":{tile['game_object']}"
 
     return path
+
+  def get_zone_name(self, tile):
+    """
+    Get the zone name (arena) for a given tile coordinate.
+    
+    INPUT:
+      tile: The tile coordinate of our interest in (x, y) form.
+    OUTPUT:
+      The zone name (arena) for the tile, or None if no arena is defined.
+    EXAMPLE OUTPUT
+      Given tile=(58, 9), returns "bedroom 2"
+    """
+
+
+    x = tile[0]
+    y = tile[1]
+    
+    tile_details = self.tiles[y][x]
+    
+    # Return the arena name if it exists, otherwise return None
+    return tile_details["arena"] if tile_details["arena"] else None
 
 
   def get_nearby_tiles(self, tile, vision_r): 

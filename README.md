@@ -101,8 +101,6 @@ Example:
 
 For a more detailed explanation see the [original readme](README_origin.md).
 
-
-
 ## Authors
 This project was developed as part of the Complex Systems course under the guidance of Professor Ali A. Minai.
 

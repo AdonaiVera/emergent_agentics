@@ -371,6 +371,7 @@ class ReverieServer:
                         if curr_tile != new_tile:
                             curr_zone = self.maze.get_zone_name(curr_tile)
                             new_zone = self.maze.get_zone_name(new_tile)
+                            
                             if curr_zone and new_zone:
                                 self.metrics.track_zone_movement(persona_name, curr_zone, new_zone)
 

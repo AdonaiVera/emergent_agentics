@@ -142,19 +142,31 @@ class PartyMetrics:
         
     def save_metrics(self, filepath: str):
         """Save all metrics to a JSON file."""
-        metrics_data = {
-            "information_spread": {
-                agent: list(info) for agent, info in self.information_spread.items()
-            },
-            "whisper_history": self.whisper_history,
-            "interaction_counts": self.interaction_counts,
-            "plan_changes": self.plan_changes,
-            "interaction_density": self.interaction_density,
-            "acceptance_rejection": self.acceptance_rejection,
-            "zone_movements": self.zone_movements,
-            "conversation_durations": self.conversation_durations,
-            "summary": self.get_metrics_summary()
-        }
-        
-        with open(filepath, 'w') as f:
-            json.dump(metrics_data, f, indent=2) 
+        try:
+            # Convert all sets to lists for JSON serialization
+            metrics_data = {
+                "information_spread": {
+                    agent: list(info) for agent, info in self.information_spread.items()
+                },
+                "whisper_history": self.whisper_history,
+                "interaction_counts": self.interaction_counts,
+                "plan_changes": self.plan_changes,
+                "interaction_density": self.interaction_density,
+                "acceptance_rejection": self.acceptance_rejection,
+                "zone_movements": {
+                    agent: {
+                        "count": data["count"],
+                        "zones": list(data["zones"])
+                    } for agent, data in self.zone_movements.items()
+                },
+                "conversation_durations": self.conversation_durations,
+                "summary": self.get_metrics_summary()
+            }
+            
+            print("Metrics data")
+            print(metrics_data)
+            with open(filepath, 'w') as f:
+                json.dump(metrics_data, f, indent=2) 
+        except Exception as e:
+            print(f"Error saving metrics: {e}")
+            raise e
