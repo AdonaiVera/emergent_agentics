@@ -127,7 +127,12 @@ class PartyMetrics:
                 if (self.acceptance_rejection["accept"] + self.acceptance_rejection["reject"]) > 0 
                 else 0
             ),
-            "zone_movements": self.zone_movements,
+            "zone_movements": {
+                agent: {
+                    "count": data["count"],
+                    "zones": list(data["zones"])
+                } for agent, data in self.zone_movements.items()
+            },
             "average_conversation_duration": (
                 sum(d["duration"] for d in self.conversation_durations) / 
                 len(self.conversation_durations)

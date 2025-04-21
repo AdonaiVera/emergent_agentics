@@ -22,6 +22,7 @@ logs/*
 !environment/frontend_server/storage/base_the_ville_smol_elections_5_voters_swapped_personalities
 !environment/frontend_server/storage/base_hide_and_seek/
 !environment/frontend_server/storage/base_search_and_rescue/
+environment/frontend_server/compressed_storage
 ####################################
 
 # Ignore all environment and movement files except the starting environment file

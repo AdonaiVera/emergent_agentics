@@ -62,7 +62,7 @@ The party environment is modeled as a tree-structured space with distinct zones:
 - Memory stream storage (observations, reflections, plans)
 - Dynamic plan modification
 - Information sharing through whisper function
-- Social group formation
+- Team formation and coordination
 
 ## Setting Up The Environment
 
@@ -94,12 +94,38 @@ Example:
 ```
 
 
+
 ### Endpoint list
 - [http://localhost:8000/](http://localhost:8000/) - check if the server is running
 - [http://localhost:8000/simulator_home](http://localhost:8000/simulator_home) - watch the live simulation
 - `http://localhost:8000/replay/<simulation-name>/<starting-time-step>` - replay a simulation
 
 For a more detailed explanation see the [original readme](README_origin.md).
+
+### Running a Demo
+
+To create a polished demo with proper character sprites:
+
+1. First, compress your simulation:
+   - Open `reverie/compress_sim_storage.py`
+   - Run the `compress()` function with your simulation name
+   ```python
+   compress("your_simulation_name")
+   ```
+
+2. View the demo in your browser:
+   ```
+   http://localhost:8000/demo/<simulation-name>/<starting-time-step>/<simulation-speed>
+   ```
+   
+   Parameters:
+   - `simulation-name`: Name of your simulation
+   - `starting-time-step`: Where to begin the demo (e.g., 1)
+   - `simulation-speed`: Speed from 1 (slowest) to 5 (fastest)
+
+Example demo URL:
+[http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/](http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/)
+
 
 ## Authors
 This project was developed as part of the Complex Systems course under the guidance of Professor Ali A. Minai.
