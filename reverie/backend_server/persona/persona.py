@@ -123,19 +123,16 @@ class Persona:
         perception, as well as the maze and the first day state to conduct both 
         the long term and short term planning for the persona. 
 
-        INPUT: 
-            maze: Current <Maze> instance of the world. 
-            personas: A dictionary that contains all persona names as keys, and the 
-                      Persona instance as values. 
-            new_day: This can take one of the three values. 
-                1) <Boolean> False -- It is not a "new day" cycle (if it is, we would
-                   need to call the long term planning sequence for the persona). 
-                2) <String> "First day" -- It is literally the start of a simulation,
-                   so not only is it a new day, but also it is the first day. 
-                2) <String> "New day" -- It is a new day. 
-            retrieved: dictionary of dictionary. The first layer specifies an event,
-                       while the latter layer specifies the "curr_event", "events", 
-                       and "thoughts" that are relevant.
+        INPUT:
+            maze: Current <Maze> instance representing the virtual world state
+            personas: Dictionary mapping persona names to their Persona instances
+            new_day: State indicator with three possible values:
+                1) False - Regular time step (no long-term planning needed)
+                2) "New Party Session" - Initial simulation start (first day)
+                3) "Reflect party session" - End of party session reflection
+            retrieved: Nested dictionary containing contextual information:
+                      - Outer layer: Event identifiers
+                      - Inner layer: Contains "curr_event", "events", and "thoughts"
         OUTPUT 
             The target action address of the persona (persona.scratch.act_address).
         """
@@ -195,16 +192,15 @@ class Persona:
         # Updating persona's scratch memory with <curr_tile>. 
         self.scratch.curr_tile = curr_tile
 
-        # We figure out whether the persona started a new day, and if it is a new
-        # day, whether it is the very first day of the simulation. This is 
+        # We figure out whether the persona started a new party session, and if it is a new
+        # party session, whether it is the very first party of the simulation. This is 
         # important because we set up the persona's long term plan at the start of
-        # a new day. 
+        # a new party session. 
         new_day = False
         if not self.scratch.curr_time: 
-            new_day = "First day"
-        elif (self.scratch.curr_time.strftime('%A %B %d')
-              != curr_time.strftime('%A %B %d')):
-            new_day = "New day"
+            new_day = "New Party Session"
+        elif ((curr_time - self.scratch.curr_time).total_seconds() >= 7200):
+            new_day = "Reflect party session"
         self.scratch.curr_time = curr_time
 
         # Main cognitive sequence begins here. 
