@@ -614,6 +614,7 @@ def _long_term_planning(persona, new_day):
 
 
 def _determine_action(persona, maze): 
+    print("🔵 [DEBUG] Starting action determination")
     """
     Creates the next action sequence for the persona. 
     The main goal of this function is to run "add_new_action" on the persona's 
@@ -711,24 +712,39 @@ def _determine_action(persona, maze):
 
 
     act_desp, act_dura = persona.scratch.f_daily_schedule[curr_index] 
-
-
+    print("🔵 [DEBUG] Action description:", act_desp)
+    print("🔵 [DEBUG] Action duration:", act_dura)
 
     # Finding the target location of the action and creating action-related
     # variables.
     act_world = maze.access_tile(persona.scratch.curr_tile)["world"]
-    # act_sector = maze.access_tile(persona.scratch.curr_tile)["sector"]
+    print("🔵 [DEBUG] Action world:", act_world)
+    
     act_sector = generate_action_sector(act_desp, persona, maze)
+    print("🔵 [DEBUG] Action sector:", act_sector)
+    
     act_arena = generate_action_arena(act_desp, persona, maze, act_world, act_sector)
+    print("🔵 [DEBUG] Action arena:", act_arena)
+    
     act_address = f"{act_world}:{act_sector}:{act_arena}"
-    act_game_object = generate_action_game_object(act_desp, act_address,
-                                                  persona, maze)
+    print("🔵 [DEBUG] Action address:", act_address)
+    
+    act_game_object = generate_action_game_object(act_desp, act_address, persona, maze)
+    print("🔵 [DEBUG] Action game object:", act_game_object)
+    
     new_address = f"{act_world}:{act_sector}:{act_arena}:{act_game_object}"
+    print("🔵 [DEBUG] New address:", new_address)
+    
     act_pron = generate_action_pronunciatio(act_desp, persona)
+    print("🔵 [DEBUG] Action pronunciatio:", act_pron)
+    
     act_event = generate_action_event_triple(act_desp, persona)
+    print("🔵 [DEBUG] Action event triple:", act_event)
+    
     # Persona's actions also influence the object states. We set those up here.
     act_obj_desp_response = generate_act_obj_desc(act_game_object, act_desp, persona)
     act_obj_desp = act_obj_desp_response[0] if act_obj_desp_response else None
+    print("🔵 [DEBUG] Action object description:", act_obj_desp)
 
     act_obj_pron = generate_action_pronunciatio(act_obj_desp, persona)
     act_obj_event = generate_act_obj_event_triple(act_game_object, 

@@ -73,4 +73,5 @@ def run_gpt_generate_safety_score(comment: str, test_input=None, verbose=False):
   if verbose:
     print_run_prompts(prompt_file, None, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Anthromorphosization completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

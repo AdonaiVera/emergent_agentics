@@ -11,6 +11,27 @@ Modified by: Adonai Vera (adonai.vera@gmail.com)
 Date: 2025-04-21
 '''
 
+'''
+# Hard code for now the topic of the party 
+🟢 1. Informal House Party
+party_topic = "It's a relaxed 'Karaoke and Chill' night with music playing in the background, a makeshift stage in the living room, and people casually taking turns on the mic while others hang out in the kitchen or lounge on the couch."
+
+🔵 2. Formal Networking Event
+party_topic = "It's a professional networking night hosted at a modern apartment, where guests are encouraged to introduce themselves, discuss their work or studies, and exchange contact information. There are designated conversation zones, light refreshments, and a scheduled round of 2-minute intros at 8:00 PM to help break the ice."
+
+
+🎂 3. Birthday Party
+party_topic = "It's a cozy birthday celebration for Klaus Müller, hosted at his apartment. Friends are arriving with small gifts, sharing stories, and enjoying snacks and drinks in the living room. A cake-cutting is planned around 10:00 PM, followed by music, dancing, and spontaneous toasts in honor of Klaus throughout the night."
+
+🎭 4. Theme Party (e.g., Costume Night)
+party_topic = "It's a Costume Night with a 'Movie Characters' theme—guests arrive dressed as their favorite film icons, from superheroes to rom-com leads. The atmosphere is playful and creative, with a photo booth in the hallway, a casual costume contest planned for midnight, and guests mingling in character across rooms while discussing their outfits."
+
+🟠 5. Speed Friending / Icebreaker Event
+party_topic = "It's a Speed Friending night designed to help guests meet as many new people as possible. The living room is arranged with pairs of chairs facing each other, and every 5 minutes a bell signals guests to rotate. Between rounds, there are short group games and snack breaks to keep the energy up and conversations flowing naturally."
+'''
+
+party_topic= "It's a relaxed 'Karaoke and Chill' night with music playing in the background, a makeshift stage in the living room, and people casually taking turns on the mic while others hang out in the kitchen or lounge on the couch."
+
 def create_prompt(prompt_input: dict[str, Any]):
     identity_stable_set = prompt_input["identity_stable_set"]
     lifestyle = prompt_input["lifestyle"]
@@ -22,6 +43,7 @@ def create_prompt(prompt_input: dict[str, Any]):
     {identity_stable_set}
 
     In general, {lifestyle}
+    
     Today is {curr_date}. Describe {persona_name}'s plan for the party that runs from {start_party_hour}:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
     - Arrive at the party at 7:00 PM
     - Mingle with guests from 7:00 PM to 9:00 PM
@@ -29,7 +51,9 @@ def create_prompt(prompt_input: dict[str, Any]):
     - Dance and socialize from 10:00 PM to 11:00 PM
     - Continue partying until 5:00 AM
 
-    Make sure to include a mix of social activities, food/drinks, and entertainment throughout the night. The plan should reflect {persona_name}'s personality and preferences as described above.
+    Party Topic: {party_topic}
+
+    Make sure to include a mix of social activities base on the party topic, food/drinks, and entertainment throughout the night. The plan should reflect {persona_name}'s personality and preferences as described above.
     """
     return prompt
 
@@ -111,4 +135,5 @@ def run_gpt_prompt_daily_plan(persona, start_party_hour, test_input=None, verbos
     if debug or verbose:
         print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+    print("🔵 [DEBUG] Daily plan completed successfully")
     return output, [output, prompt, gpt_param, prompt_input, fail_safe]

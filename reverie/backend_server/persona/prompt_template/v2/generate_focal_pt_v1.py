@@ -63,4 +63,5 @@ def run_gpt_prompt_focal_pt_v1(persona, statements, n, test_input=None, verbose=
   if debug or verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Focal point completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

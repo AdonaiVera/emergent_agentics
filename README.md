@@ -39,6 +39,35 @@ This project investigates how autonomous agents form social groups, share inform
 - Agent Mobility
 - Conversation Duration
 
+### Visualizing Metrics
+The project includes a comprehensive visualization system to analyze emergent behaviors in the simulation. To generate visualizations:
+
+1. Install the required dependencies:
+```bash
+pip install matplotlib seaborn networkx pandas numpy
+```
+
+2. Run the visualization script:
+```bash
+python reverie/backend_server/persona/insight/visualize_metrics.py
+```
+
+This will generate several visualizations in the `visualizations` directory:
+
+- **Interaction Network**: Shows the social network structure of agents with edge thickness representing interaction frequency
+- **Interaction Heatmap**: Displays the frequency of interactions between all pairs of agents
+- **Information Spread**: Visualizes how much information each agent has received
+- **Acceptance/Rejection Rates**: Shows the ratio of successful vs failed interactions
+- **Zone Movements**: Displays agent mobility patterns between different zones
+- **Conversation Durations**: Shows the distribution of conversation lengths
+
+These visualizations help analyze:
+- Social network formation and dynamics
+- Information propagation patterns
+- Success rates of social interactions
+- Spatial behavior and movement patterns
+- Typical conversation characteristics
+
 ## Party Simulation
 
 ### Environment Structure
@@ -124,7 +153,7 @@ To create a polished demo with proper character sprites:
    - `simulation-speed`: Speed from 1 (slowest) to 5 (fastest)
 
 Example demo URL:
-[http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/](http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/)
+[http://localhost:8000/demo/test_1-s-0-0-186_good/1/3/](http://localhost:8000/demo/July1_the_ville_isabella_maria_klaus-step-3-20/1/3/)
 
 
 ## Authors

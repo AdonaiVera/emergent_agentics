@@ -84,4 +84,5 @@ def run_gpt_prompt_insight_and_guidance(
   if debug or verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Insight and guidance completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

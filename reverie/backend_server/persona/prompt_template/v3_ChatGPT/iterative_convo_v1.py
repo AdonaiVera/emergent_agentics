@@ -175,4 +175,6 @@ def run_gpt_generate_iterative_chat_utt(
       prompt_file, init_persona, gpt_param, prompt_input, prompt, output
     )
 
+  print("🔵 [DEBUG] Iterative conversation completed successfully")
+
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

@@ -62,6 +62,7 @@ def perceive(persona, maze):
     OUTPUT:
         ret_events: a list of <ConceptNode> that are perceived and new.
     """
+    print("🔵 [DEBUG] Starting perception for persona:", persona.name)
     # PERCEIVE SPACE
     # We get the nearby tiles given our current tile and the persona's vision
     # radius.
@@ -133,6 +134,7 @@ def perceive(persona, maze):
     # associative memory.
     ret_events = []
     for p_event in perceived_events:
+        print("🔵 [DEBUG] Processing perceived event:", p_event)
         s, p, o, desc = p_event
         if not p:
             # If the object is not present, then we default the event to "idle".
@@ -141,6 +143,7 @@ def perceive(persona, maze):
             desc = "idle"
         desc = f"{s.split(':')[-1]} is {desc}"
         p_event = (s, p, o)
+        print("🔵 [DEBUG] Processed event:", p_event)
 
         # We retrieve the latest persona.scratch.retention events. If there is
         # something new that is happening (that is, p_event not in latest_events),
@@ -148,7 +151,10 @@ def perceive(persona, maze):
         latest_events = persona.a_mem.get_summarized_latest_events(
             persona.scratch.retention
         )
+        print("🔵 [DEBUG] Latest events:", latest_events)
+        
         if p_event not in latest_events:
+            print("🔵 [DEBUG] New event detected, processing...")
             # We start by managing keywords.
             keywords = set()
             sub = p_event[0]
@@ -204,6 +210,7 @@ def perceive(persona, maze):
                 chat_node_ids = [chat_node.node_id]
 
             # Finally, we add the current event to the agent's memory.
+            print("🔵 [DEBUG] Adding event to memory")
             ret_events += [
                 persona.a_mem.add_event(
                     persona.scratch.curr_time,
@@ -218,7 +225,11 @@ def perceive(persona, maze):
                     chat_node_ids,
                 )
             ]
+            print("✅ [DEBUG] Event added to memory")
             persona.scratch.importance_trigger_curr -= event_poignancy
             persona.scratch.importance_ele_n += 1
+        else:
+            print("🔵 [DEBUG] Event already in latest events, skipping")
 
+    print("✅ [DEBUG] Perception completed")
     return ret_events
