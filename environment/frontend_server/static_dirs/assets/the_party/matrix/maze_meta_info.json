@@ -1,0 +1,5 @@
+{"world_name": "the party", 
+ "maze_width": 27,
+ "maze_height": 38,
+ "sq_tile_size": 32,
+ "special_constraint": ""}
