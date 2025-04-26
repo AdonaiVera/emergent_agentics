@@ -1,0 +1,30 @@
+{
+  "the Ville": {
+    "Dorm for Oak Hill College": {
+      "garden": [
+        "dorm garden"
+      ],
+      "Klaus Mueller's room": [
+        "bed",
+        "game console",
+        "closet",
+        "desk"
+      ],
+      "woman's bathroom": [
+        "toilet",
+        "shower",
+        "bathroom sink"
+      ],
+      "common room": [
+        "common room sofa",
+        "pool table",
+        "common room table"
+      ],
+      "man's bathroom": [
+        "shower",
+        "bathroom sink",
+        "toilet"
+      ]
+    }
+  }
+}

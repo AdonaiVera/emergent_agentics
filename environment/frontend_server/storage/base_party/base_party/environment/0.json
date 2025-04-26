@@ -1,0 +1,27 @@
+{
+  "Klaus Mueller": {
+    "maze": "the_ville",
+    "x": 5,
+    "y": 10
+  },
+  "Maria Lopez": {
+    "maze": "the_ville",
+    "x": 7,
+    "y": 16
+  },
+  "Ayesha Khan": {
+    "maze": "the_ville",
+    "x": 15,
+    "y": 18
+  },
+  "Wolfgang Schulz": {
+    "maze": "the_ville",
+    "x": 25,
+    "y": 14
+  },
+  "Tamara Taylor": {
+    "maze": "the_ville",
+    "x": 18, 
+    "y": 7
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "fork_sim_code": "base_the_ville_isabella_maria_klaus",
+  "start_date": "February 11, 2025",
+  "curr_time": "February 11, 2025, 19:00:00",
+  "sec_per_step": 10,
+  "maze_name": "the_party",
+  "persona_names": [
+    "Klaus Mueller",
+    "Maria Lopez", 
+    "Ayesha Khan", 
+    "Wolfgang Schulz", 
+    "Tamara Taylor"
+  ],
+  "step": 0
+}

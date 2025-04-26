@@ -1,0 +1,37 @@
+{
+  "the Ville": {
+    "Dorm for Oak Hill College": {
+      "garden": [
+        "dorm garden"
+      ],
+      "Wolfgang Schulz's room": [
+        "desk",
+        "bed",
+        "game console",
+        "lifting weight",
+        "closet"
+      ],
+      "Ayesha Khan's room": [
+        "shelf",
+        "closet",
+        "desk",
+        "bed"
+      ],
+      "woman's bathroom": [
+        "toilet",
+        "shower",
+        "bathroom sink"
+      ],
+      "common room": [
+        "common room sofa",
+        "pool table",
+        "common room table"
+      ],
+      "man's bathroom": [
+        "shower",
+        "bathroom sink",
+        "toilet"
+      ]
+    }
+  }
+}
