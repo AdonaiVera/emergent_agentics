@@ -87,4 +87,5 @@ def run_gpt_prompt_wake_up_hour(persona, test_input=None, verbose=False):
   if debug or verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Wake up hour completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

@@ -86,6 +86,7 @@ def run_gpt_prompt_pronunciatio(action_description, persona, verbose=False):
   if verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Pronunciation completed successfully")
   if output:
     return output, [output, prompt, gpt_param, prompt_input, fail_safe]
 

@@ -78,4 +78,5 @@ def run_gpt_prompt_memo_on_convo_v1(
   if debug or verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Memo on conversation completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

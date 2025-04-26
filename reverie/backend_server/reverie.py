@@ -29,6 +29,7 @@ import math
 import os
 import shutil
 import traceback
+import random
 
 from global_methods import read_file_to_list, check_if_file_exists, copyanything, freeze
 from utils import maze_assets_loc, fs_storage, fs_temp_storage
@@ -37,7 +38,7 @@ from persona.persona import Persona
 from persona.cognitive_modules.converse import load_history_via_whisper
 from persona.prompt_template.run_gpt_prompt import run_plugin
 from persona.insight.metrics import PartyMetrics
-from persona.insight.whisper import whisper
+from persona.cognitive_modules.converse import generate_whisper_conversation
 
 current_file = os.path.abspath(__file__)
 
@@ -138,6 +139,9 @@ class ReverieServer:
         # # e.g., dict[("Adam Abraham", "Zane Xu")] = "Adam: baba \n Zane:..."
         # self.persona_convo = dict()
 
+        # Initialize metrics tracking
+        self.metrics = PartyMetrics()
+
         # Loading in all personas. 
         init_env_file = f"{sim_folder}/environment/{str(self.step)}.json"
         init_env = json.load(open(init_env_file))
@@ -146,6 +150,9 @@ class ReverieServer:
             p_x = init_env[persona_name]["x"]
             p_y = init_env[persona_name]["y"]
             curr_persona = Persona(persona_name, persona_folder)
+            
+            # Set the metrics object for this persona
+            curr_persona.metrics = self.metrics
 
             self.personas[persona_name] = curr_persona
             self.personas_tile[persona_name] = (p_x, p_y)
@@ -173,8 +180,15 @@ class ReverieServer:
         with open(f"{fs_temp_storage}/curr_step.json", "w") as outfile: 
             outfile.write(json.dumps(curr_step, indent=2))
 
-        # Initialize metrics tracking
-        self.metrics = PartyMetrics()
+        # Initialize whisper settings
+        self.whisper_interval = 400 
+        self.whisper_messages = [
+            "There's a secret underground party happening tonight at the old warehouse",
+            "The mayor is planning to close down the local park for redevelopment",
+            "A famous celebrity is secretly visiting town this weekend",
+            "The local bakery is giving away free pastries tomorrow morning",
+            "There's going to be a surprise fireworks show at the beach tonight"
+        ]
 
     def save(self): 
         """
@@ -338,6 +352,27 @@ class ReverieServer:
 
             # Update metrics step counter
             self.metrics.update_step(self.step)
+            
+            # Check if we should trigger a whisper this step
+            if self.step % self.whisper_interval == 0:
+                # Select random target agent
+                target_name = random.choice(list(self.personas.keys()))
+                target = self.personas[target_name]
+                
+                # Select a random message
+                message = random.choice(self.whisper_messages)
+                
+                # Generate the whisper conversation
+                thought = generate_whisper_conversation(
+                    target,
+                    message,
+                    self.curr_time
+                )
+                
+                # Track the whisper in metrics using existing functions
+                self.metrics.track_information_spread("system", target_name, message)
+                
+                print(f"Step {self.step}: System whispered to {target_name}: {message}")
 
             # <curr_env_file> file is the file that our frontend outputs. When the
             # frontend has done its job and moved the personas, then it will put a 
@@ -424,6 +459,12 @@ class ReverieServer:
 
                     # Track interaction density for this step
                     step_interactions = 0
+                    active_agents = set()
+                    interaction_types = {
+                        "conversation": 0,
+                        "whisper": 0,
+                        "reaction": 0
+                    }
 
                     for persona_name, persona in self.personas.items():
                         # Track plan changes for metrics
@@ -446,7 +487,8 @@ class ReverieServer:
                             self.metrics.track_plan_change(
                                 persona_name, 
                                 old_plan, 
-                                persona.scratch.act_address
+                                persona.scratch.act_address,
+                                persona.scratch.daily_req  
                             )
                         
                         movements["persona"][persona_name] = {}
@@ -462,18 +504,44 @@ class ReverieServer:
                         # Track conversations and interactions
                         if persona.scratch.chat:
                             step_interactions += 1
+                            active_agents.add(persona_name)
                             if persona.scratch.chatting_with:
+                                active_agents.add(persona.scratch.chatting_with)
                                 self.metrics.track_interaction(
                                     persona_name, 
                                     persona.scratch.chatting_with
                                 )
-                                # Track conversation duration
-                                if persona.scratch.chatting_end_time:
+                                # Track conversation duration only when the conversation actually ends
+                                if persona.scratch.chatting_end_time and not persona.scratch.chatting_with:
                                     duration = (
                                         persona.scratch.chatting_end_time - 
                                         persona.scratch.act_start_time
                                     ).total_seconds()
-                                    self.metrics.track_conversation_duration(duration)
+                                    # Get current location
+                                    curr_tile = self.personas_tile[persona_name]
+                                    location = self.maze.get_zone_name(curr_tile)
+                                    
+                                    # Get conversation context from chat
+                                    context = persona.scratch.chat
+                                    
+                                    # Track conversation with enhanced details
+                                    self.metrics.track_conversation_duration(
+                                        duration=duration,
+                                        participants=[persona_name, persona.scratch.chatting_with],
+                                        location=location,
+                                        context=context
+                                    )
+                                interaction_types["conversation"] += 1
+                            else:
+                                interaction_types["reaction"] += 1
+
+                        # Track whispers
+                        if hasattr(persona.scratch, 'whisper_history') and persona.scratch.whisper_history:
+                            interaction_types["whisper"] += len(persona.scratch.whisper_history)
+                            step_interactions += len(persona.scratch.whisper_history)
+                            active_agents.add(persona_name)
+                            for whisper in persona.scratch.whisper_history:
+                                active_agents.add(whisper["target"])
 
                         if headless:
                             next_env[persona_name] = {
@@ -483,7 +551,11 @@ class ReverieServer:
                             }
 
                     # Track interaction density for this step
-                    self.metrics.track_interaction_density(step_interactions)
+                    self.metrics.track_interaction_density(
+                        step_interactions,
+                        list(active_agents),
+                        interaction_types
+                    )
 
                     # Include the meta information about the current stage in the
                     # movements dictionary.

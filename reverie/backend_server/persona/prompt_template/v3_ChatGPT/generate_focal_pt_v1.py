@@ -82,6 +82,7 @@ def run_gpt_prompt_focal_pt(
     return output, [output, prompt, gpt_param, prompt_input, fail_safe]
   # ChatGPT Plugin ===========================================================
 
+  print("🔵 [DEBUG] Focal point completed successfully")
   # Fall back to the old version
   return run_gpt_prompt_focal_pt_v1(
     persona, statements, num_questions, test_input, verbose

@@ -80,6 +80,7 @@ def run_gpt_prompt_memo_on_convo(persona, all_utt, test_input=None, verbose=Fals
   if verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Memo on conversation completed successfully")
   if output:
     return output, [output, prompt, gpt_param, prompt_input, fail_safe]
   # ChatGPT Plugin ===========================================================

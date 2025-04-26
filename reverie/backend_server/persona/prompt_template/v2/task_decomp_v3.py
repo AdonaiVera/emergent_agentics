@@ -255,4 +255,5 @@ def run_gpt_prompt_task_decomp(persona, task, duration, test_input=None, verbose
   if verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Task decomposition completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

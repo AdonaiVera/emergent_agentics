@@ -6,6 +6,7 @@ Description: An extra cognitive module for generating conversations.
 """
 import datetime
 import traceback
+import random
 
 import sys
 sys.path.append('../')
@@ -351,3 +352,33 @@ def open_convo_session(persona, convo_mode, safe_mode=True, direct=False, questi
     persona.a_mem.add_thought(created, expiration, s, p, o, 
                               thought, keywords, thought_poignancy, 
                               thought_embedding_pair, None)
+
+def generate_whisper_conversation(target_persona, message, curr_time):
+    """
+    Generate a whisper conversation between two agents at specific steps.
+    
+    Args:
+        target_persona: The target agent
+        message: The message to whisper
+        metrics: Metrics object to track the interaction
+        curr_time: Current simulation time
+    """
+    # Generate inner thought for the whisper
+    thought = generate_inner_thought(target_persona, message)
+    
+    # Create the whisper event
+    created = curr_time
+    expiration = curr_time + datetime.timedelta(days=30)
+    s, p, o = generate_action_event_triple(thought, target_persona)
+    keywords = set([s, p, o])
+    thought_poignancy = generate_poig_score(target_persona, "event", message)
+    thought_embedding_pair = (thought, get_embedding(thought))
+    
+    # Add to target's memory
+    target_persona.a_mem.add_thought(
+        created, expiration, s, p, o,
+        thought, keywords, thought_poignancy,
+        thought_embedding_pair, None
+    )
+      
+    return thought

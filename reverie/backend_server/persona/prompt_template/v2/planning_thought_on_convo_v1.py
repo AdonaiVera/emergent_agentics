@@ -82,4 +82,5 @@ def run_gpt_prompt_planning_thought_on_convo(
   if debug or verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Planning thought on conversation completed successfully")
   return output, [output, prompt, gpt_param, prompt_input, fail_safe]

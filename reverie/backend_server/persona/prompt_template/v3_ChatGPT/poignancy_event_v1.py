@@ -95,6 +95,7 @@ def run_gpt_prompt_event_poignancy(
   if verbose:
     print_run_prompts(prompt_file, persona, gpt_param, prompt_input, prompt, output)
 
+  print("🔵 [DEBUG] Poignancy event completed successfully")
   if output:
     return output, [output, prompt, gpt_param, prompt_input, fail_safe]
   # ChatGPT Plugin ===========================================================

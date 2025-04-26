@@ -850,10 +850,18 @@ def _should_react(persona, retrieved, personas):
             if init_persona.scratch.chatting_with_buffer[target_persona.name] > 0: 
                 return False
 
-        if generate_decide_to_talk(init_persona, target_persona, retrieved): 
-
+        talk_decision = generate_decide_to_talk(init_persona, target_persona, retrieved)
+        
+        # Track acceptance/rejection metrics
+        if hasattr(init_persona, 'metrics'):
+            init_persona.metrics.track_acceptance_rejection(
+                accepted=talk_decision,
+                initiator=init_persona.name,
+                target=target_persona.name
+            )
+        
+        if talk_decision: 
             return True
-
         return False
 
     def lets_react(init_persona, target_persona, retrieved): 
@@ -882,6 +890,14 @@ def _should_react(persona, retrieved, personas):
 
         react_mode = generate_decide_to_react(init_persona, 
                                               target_persona, retrieved)
+
+        # Track acceptance/rejection metrics for reactions
+        if hasattr(init_persona, 'metrics'):
+            init_persona.metrics.track_acceptance_rejection(
+                accepted=react_mode == "1",  # Only "1" means accepted
+                initiator=init_persona.name,
+                target=target_persona.name
+            )
 
         if react_mode == "1": 
             wait_until = ((target_persona.scratch.act_start_time 

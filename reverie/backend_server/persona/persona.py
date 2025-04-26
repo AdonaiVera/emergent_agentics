@@ -44,6 +44,9 @@ class Persona:
         # <scratch> is the persona's scratch (short term memory) space. 
         scratch_saved = f"{folder_mem_saved}/bootstrap_memory/scratch.json"
         self.scratch = Scratch(scratch_saved)
+        
+        # Initialize metrics tracking for this persona
+        self.metrics = None  # Will be set by ReverieServer
 
     def save(self, save_folder): 
         """
