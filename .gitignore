@@ -13,6 +13,10 @@ reverie/backend_server/cost-logs/*
 logs/*
 !logs/skip-morning_2024-05-15_13-54-44.txt
 
+# Resuts
+results/
+visualizations/
+
 ### Add simulations to keep here ###
 !environment/frontend_server/storage/base_the_ville_isabella_maria_klaus/
 !environment/frontend_server/storage/base_the_ville_n25/*

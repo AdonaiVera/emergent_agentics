@@ -74,4 +74,4 @@ def compress(sim_code):
 
 
 if __name__ == "__main__":
-    compress("test_1-s-0-0-186_good")
+    compress("formal_networking_event-s-0-0-1800")

@@ -19,7 +19,6 @@ party_topic = "It's a relaxed 'Karaoke and Chill' night with music playing in th
 🔵 2. Formal Networking Event
 party_topic = "It's a professional networking night hosted at a modern apartment, where guests are encouraged to introduce themselves, discuss their work or studies, and exchange contact information. There are designated conversation zones, light refreshments, and a scheduled round of 2-minute intros at 8:00 PM to help break the ice."
 
-
 🎂 3. Birthday Party
 party_topic = "It's a cozy birthday celebration for Klaus Müller, hosted at his apartment. Friends are arriving with small gifts, sharing stories, and enjoying snacks and drinks in the living room. A cake-cutting is planned around 10:00 PM, followed by music, dancing, and spontaneous toasts in honor of Klaus throughout the night."
 
@@ -30,7 +29,7 @@ party_topic = "It's a Costume Night with a 'Movie Characters' theme—guests arr
 party_topic = "It's a Speed Friending night designed to help guests meet as many new people as possible. The living room is arranged with pairs of chairs facing each other, and every 5 minutes a bell signals guests to rotate. Between rounds, there are short group games and snack breaks to keep the energy up and conversations flowing naturally."
 '''
 
-party_topic= "It's a relaxed 'Karaoke and Chill' night with music playing in the background, a makeshift stage in the living room, and people casually taking turns on the mic while others hang out in the kitchen or lounge on the couch."
+party_topic= "It's a Costume Night with a 'Movie Characters' theme—guests arrive dressed as their favorite film icons, from superheroes to rom-com leads. The atmosphere is playful and creative, with a photo booth in the hallway, a casual costume contest planned for midnight, and guests mingling in character across rooms while discussing their outfits."
 
 def create_prompt(prompt_input: dict[str, Any]):
     identity_stable_set = prompt_input["identity_stable_set"]

@@ -186,7 +186,7 @@ def load_agent_history(rs, history_file: str) -> None:
 
 
 if __name__ == '__main__':
-    checkpoint_freq = 200 # 1 step = 10 sec
+    checkpoint_freq = 2000 # 1 step = 10 sec
     max_stepbacks = 5
     curr_stepbacks = 0
     log_path = "cost-logs" # where the simulations' prints are stored
