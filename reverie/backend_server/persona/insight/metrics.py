@@ -206,9 +206,22 @@ class PartyMetrics:
             context: Optional context or topic of the conversation
         """
         # Create a unique key for the conversation based on its content
+        hashable_context = None
+        if context:
+            if isinstance(context, list):
+                # If context is a list of messages, make it hashable
+                # Each message might be [speaker, text] or similar
+                hashable_context = tuple(
+                    tuple(item) if isinstance(item, list) else item
+                    for item in context
+                )
+            else:
+                # If it's already a string or other hashable type
+                hashable_context = context
+        
         conv_key = (
             tuple(sorted(participants)),
-            tuple(context) if context else None
+            hashable_context
         )
         
         # Only track if we haven't seen this conversation before
@@ -255,6 +268,15 @@ class PartyMetrics:
                     "average_propagation_time": avg_prop_time
                 }
         
+        # Add topic mentions summary
+        topic_mention_count = {}
+        if hasattr(self, 'topic_mentions'):
+            for mention in self.topic_mentions:
+                topic = mention['topic']
+                if topic not in topic_mention_count:
+                    topic_mention_count[topic] = 0
+                topic_mention_count[topic] += 1
+        
         return {
             "information_spread": {
                 agent: len(info) for agent, info in self.information_spread.items()
@@ -290,7 +312,8 @@ class PartyMetrics:
             "simulation_duration": (
                 (datetime.now() - self.start_time).total_seconds()
                 if self.start_time else 0
-            )
+            ),
+            "topic_mentions": topic_mention_count
         }
         
     def save_metrics(self, filepath: str):
@@ -323,6 +346,7 @@ class PartyMetrics:
                     } for agent, data in self.zone_movements.items()
                 },
                 "conversation_durations": self.conversation_durations,
+                "topic_mentions": getattr(self, 'topic_mentions', []),
                 "summary": self.get_metrics_summary()
             }
             
@@ -333,3 +357,27 @@ class PartyMetrics:
         except Exception as e:
             print(f"Error saving metrics: {e}")
             raise e
+
+    def track_topic_mention(self, speaker: str, listener: str, topic: str, context: str = None):
+        """Track when a specific topic is mentioned in a conversation.
+        
+        Args:
+            speaker: Name of the agent who mentioned the topic
+            listener: Name of the agent who heard the topic
+            topic: The topic that was mentioned
+            context: Optional context from the conversation
+        """
+        if not hasattr(self, 'topic_mentions'):
+            self.topic_mentions = []
+        
+        self.topic_mentions.append({
+            "step": self.current_step,
+            "speaker": speaker,
+            "listener": listener,
+            "topic": topic,
+            "context": context,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+        # Also track as information spread
+        self.track_information_spread(speaker, listener, topic)

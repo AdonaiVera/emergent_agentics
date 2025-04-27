@@ -512,26 +512,49 @@ class ReverieServer:
                                     persona.scratch.chatting_with
                                 )
                                 # Track conversation duration only when the conversation actually ends
-                                if persona.scratch.chatting_end_time and not persona.scratch.chatting_with:
-                                    duration = (
-                                        persona.scratch.chatting_end_time - 
-                                        persona.scratch.act_start_time
-                                    ).total_seconds()
-                                    # Get current location
-                                    curr_tile = self.personas_tile[persona_name]
-                                    location = self.maze.get_zone_name(curr_tile)
-                                    
-                                    # Get conversation context from chat
-                                    context = persona.scratch.chat
-                                    
-                                    # Track conversation with enhanced details
-                                    self.metrics.track_conversation_duration(
-                                        duration=duration,
-                                        participants=[persona_name, persona.scratch.chatting_with],
-                                        location=location,
-                                        context=context
-                                    )
+                                duration = (
+                                    persona.scratch.chatting_end_time - 
+                                    persona.scratch.act_start_time
+                                ).total_seconds()
+                                # Get current location
+                                curr_tile = self.personas_tile[persona_name]
+                                location = self.maze.get_zone_name(curr_tile)
+                                
+                                # Get conversation context from chat
+                                context = persona.scratch.chat
+                                
+                                # Track conversation with enhanced details
+                                self.metrics.track_conversation_duration(
+                                    duration=duration,
+                                    participants=[persona_name, persona.scratch.chatting_with],
+                                    location=location,
+                                    context=context
+                                )
                                 interaction_types["conversation"] += 1
+
+                                # Check if any whisper topics are mentioned in the conversation
+                                # Get conversation text and split into words
+                                conversation_text = ' '.join([msg[1] for msg in persona.scratch.chat])
+                                conversation_words = set(word.lower() for word in conversation_text.split() 
+                                                      if len(word) > 3)  # Filter out short connector words
+                                
+                                for topic in self.whisper_messages:
+                                    # Split topic into key words
+                                    topic_words = set(word.lower() for word in topic.split()
+                                                    if len(word) > 3)  # Filter out short connector words
+                                    
+                                    # Check if at least 3 topic words appear in conversation
+                                    matching_words = topic_words & conversation_words
+                                    print(f"Matching words: {matching_words}")
+                                    if len(matching_words) >= 3:
+                                        self.metrics.track_topic_mention(
+                                            persona_name,
+                                            persona.scratch.chatting_with, 
+                                            topic,
+                                            context=context
+                                        )
+                                        # Log the mention for debugging
+                                        print(f"Step {self.step}: Conversation between {persona_name} and {persona.scratch.chatting_with} mentioned topic: {topic}")
                             else:
                                 interaction_types["reaction"] += 1
 

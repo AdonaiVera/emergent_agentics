@@ -940,22 +940,41 @@ def _create_react(persona, inserted_act, inserted_act_dur,
     p = persona 
 
     min_sum = 0
-    for i in range (p.scratch.get_f_daily_schedule_hourly_org_index()): 
+    for i in range(p.scratch.get_f_daily_schedule_hourly_org_index()): 
         min_sum += p.scratch.f_daily_schedule_hourly_org[i][1]
-    start_hour = int (min_sum/60)
-
-    if (p.scratch.f_daily_schedule_hourly_org[p.scratch.get_f_daily_schedule_hourly_org_index()][1] >= 120):
-        end_hour = start_hour + p.scratch.f_daily_schedule_hourly_org[p.scratch.get_f_daily_schedule_hourly_org_index()][1]/60
-
-    elif (p.scratch.f_daily_schedule_hourly_org[p.scratch.get_f_daily_schedule_hourly_org_index()][1] + 
-        p.scratch.f_daily_schedule_hourly_org[p.scratch.get_f_daily_schedule_hourly_org_index()+1][1]): 
-        end_hour = start_hour + ((p.scratch.f_daily_schedule_hourly_org[p.scratch.get_f_daily_schedule_hourly_org_index()][1] + 
-                  p.scratch.f_daily_schedule_hourly_org[p.scratch.get_f_daily_schedule_hourly_org_index()+1][1])/60)
-
-    else: 
-        end_hour = start_hour + 2
+    start_hour = int(min_sum/60)
+    
+    # Get the current index and check if it's valid
+    current_index = p.scratch.get_f_daily_schedule_hourly_org_index()
+    print("🔵 [DEBUG] SCHEDULE REACT:")
+    print(f"Current index: {current_index}")
+    print(f"Start hour: {start_hour}")
+    
+    # Make sure we have a valid index and there are elements in the list
+    if current_index >= len(p.scratch.f_daily_schedule_hourly_org):
+        # Handle the case where the index is out of bounds
+        end_hour = start_hour + 2  # Default to 2 hours
+        print(f"Index out of bounds, defaulting end_hour to {end_hour}")
+    else:
+        # Now we know the current index is valid
+        print(f"Current schedule duration: {p.scratch.f_daily_schedule_hourly_org[current_index][1]} minutes")
+        if (p.scratch.f_daily_schedule_hourly_org[current_index][1] >= 120):
+            end_hour = start_hour + p.scratch.f_daily_schedule_hourly_org[current_index][1]/60
+            print(f"Long activity detected, end_hour set to {end_hour}")
+        # Check if there's a next element before trying to access it
+        elif (current_index + 1 < len(p.scratch.f_daily_schedule_hourly_org) and 
+              p.scratch.f_daily_schedule_hourly_org[current_index][1] + 
+              p.scratch.f_daily_schedule_hourly_org[current_index+1][1]): 
+            end_hour = start_hour + ((p.scratch.f_daily_schedule_hourly_org[current_index][1] + 
+                      p.scratch.f_daily_schedule_hourly_org[current_index+1][1])/60)
+            print(f"Combining current and next activity, end_hour set to {end_hour}")
+        else: 
+            end_hour = start_hour + 2
+            print(f"No valid next activity, defaulting end_hour to {end_hour}")
     end_hour = int(end_hour)
+    print(f"Final end_hour (rounded): {end_hour}")
 
+    # Rest of the function remains the same
     dur_sum = 0
     count = 0 
     start_index = None
@@ -967,9 +986,9 @@ def _create_react(persona, inserted_act, inserted_act_dur,
             end_index = count
         dur_sum += dur
         count += 1
-
+    
     ret = generate_new_decomp_schedule(p, inserted_act, inserted_act_dur, 
-                                         start_hour, end_hour)
+                                      start_hour, end_hour)
     p.scratch.f_daily_schedule[start_index:end_index] = ret
     p.scratch.add_new_action(act_address,
                              inserted_act_dur,

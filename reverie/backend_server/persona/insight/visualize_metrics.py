@@ -328,6 +328,72 @@ def plot_agent_activity_timeline(metrics: Dict, output_path: str):
     plt.savefig(f"{output_path}/agent_activity_timeline.png")
     plt.close()
 
+def plot_information_propagation(metrics: Dict, output_path: str):
+    """Create visualizations of information propagation through the network."""
+    if 'propagation_metrics' not in metrics:
+        print("No propagation metrics available")
+        return
+    
+    try:
+        # Create a bar chart of information reach
+        plt.figure(figsize=(12, 8))
+        infos = list(metrics['propagation_metrics'].keys())
+        reaches = [metrics['propagation_metrics'][info]['total_agents_reached'] for info in infos]
+        
+        # Truncate long information strings for display
+        display_infos = [info[:30] + '...' if len(info) > 30 else info for info in infos]
+        
+        plt.bar(display_infos, reaches)
+        plt.title('Information Reach by Content')
+        plt.xlabel('Information Content')
+        plt.ylabel('Number of Agents Reached')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.savefig(f"{output_path}/information_reach.png")
+        plt.close()
+        
+        # Create a visualization of propagation time
+        plt.figure(figsize=(12, 8))
+        prop_times = [metrics['propagation_metrics'][info]['average_propagation_time'] for info in infos]
+        
+        plt.bar(display_infos, prop_times)
+        plt.title('Average Propagation Time by Information Content')
+        plt.xlabel('Information Content')
+        plt.ylabel('Average Time (seconds)')
+        plt.xticks(rotation=45, ha='right')
+        plt.tight_layout()
+        plt.savefig(f"{output_path}/propagation_time.png")
+        plt.close()
+        
+        # For each piece of information, create a network graph showing propagation
+        for info, info_data in metrics['propagation_metrics'].items():
+            if len(info_data['propagation_paths']) > 1:  # Only if there's actual propagation
+                plt.figure(figsize=(12, 10))
+                G = nx.DiGraph()
+                
+                # Add all nodes and edges from the propagation paths
+                for path in info_data['propagation_paths']:
+                    if path['source'] not in G:
+                        G.add_node(path['source'])
+                    if path['target'] not in G:
+                        G.add_node(path['target'])
+                    G.add_edge(path['source'], path['target'])
+                
+                # Draw the network
+                pos = nx.spring_layout(G)
+                nx.draw(G, pos, with_labels=True, node_color='lightblue',
+                        node_size=2000, font_size=10, font_weight='bold',
+                        arrows=True, arrowsize=20)
+                plt.title(f'Information Propagation Network: {info[:30]}...' if len(info) > 30 else info)
+                plt.tight_layout()
+                # Create safe filename by replacing problematic characters
+                safe_info = info.replace(' ', '_').replace("'", "").replace('"', '')[:30]
+                plt.savefig(f"{output_path}/propagation_network_{safe_info}.png")
+                plt.close()
+        
+    except Exception as e:
+        print(f"Error plotting information propagation: {e}")
+
 def generate_all_visualizations(metrics_file: str, output_dir: str, test_prefix: str):
     """Generate all visualizations from metrics data."""
     metrics = load_metrics(metrics_file)
@@ -350,6 +416,7 @@ def generate_all_visualizations(metrics_file: str, output_dir: str, test_prefix:
     plot_interaction_density_timeline(metrics, test_output_dir)
     plot_conversation_analysis(metrics, test_output_dir)
     plot_agent_activity_timeline(metrics, test_output_dir)
+    plot_information_propagation(metrics, test_output_dir)
 
 def find_metrics_folders(base_path: str, test_prefix: str) -> List[str]:
     """Find all folders matching the pattern test_X-s-Y-* and return their paths."""
@@ -387,7 +454,8 @@ def combine_metrics(folders: List[str]) -> Dict:
             'interaction_history': []
         },
         'zone_movements': {},
-        'conversation_durations': []
+        'conversation_durations': [],
+        'propagation_metrics': {}
     }
     
     # Track seen conversations to avoid duplicates
@@ -517,6 +585,22 @@ def combine_metrics(folders: List[str]) -> Dict:
             if conv_key not in seen_conversations:
                 seen_conversations.add(conv_key)
                 combined_metrics['conversation_durations'].append(conv)
+        
+        # Combine propagation_metrics
+        if 'summary' in metrics and 'propagation_metrics' in metrics['summary']:
+            for info, info_data in metrics['summary']['propagation_metrics'].items():
+                if info not in combined_metrics['propagation_metrics']:
+                    # First time seeing this information piece, initialize it
+                    combined_metrics['propagation_metrics'][info] = {
+                        'total_agents_reached': 0,
+                        'propagation_paths': [],
+                        'average_propagation_time': 0
+                    }
+                
+                # Append all propagation paths
+                combined_metrics['propagation_metrics'][info]['propagation_paths'].extend(
+                    info_data.get('propagation_paths', [])
+                )
     
     # Calculate total and rates for acceptance_rejection
     total = combined_metrics['acceptance_rejection']['accept'] + combined_metrics['acceptance_rejection']['reject']
@@ -539,12 +623,43 @@ def combine_metrics(folders: List[str]) -> Dict:
             type_data['acceptance_rate'] = type_data['accept'] / type_total
             type_data['rejection_rate'] = type_data['reject'] / type_total
     
+    # Recalculate propagation metrics statistics
+    for info, info_data in combined_metrics['propagation_metrics'].items():
+        # Get unique set of agents who received this information
+        agents_reached = set()
+        for path in info_data['propagation_paths']:
+            agents_reached.add(path['target'])
+        
+        # Update total_agents_reached
+        info_data['total_agents_reached'] = len(agents_reached)
+        
+        # Recalculate average propagation time if we have multiple paths
+        paths = info_data['propagation_paths']
+        if len(paths) > 1:
+            try:
+                # Sort paths by timestamp
+                paths.sort(key=lambda p: datetime.fromisoformat(p['timestamp']))
+                
+                # Calculate time differences from first message
+                first_time = datetime.fromisoformat(paths[0]['timestamp'])
+                time_diffs = [(datetime.fromisoformat(p['timestamp']) - first_time).total_seconds() 
+                             for p in paths[1:]]
+                
+                # Calculate average propagation time
+                if time_diffs:
+                    info_data['average_propagation_time'] = sum(time_diffs) / len(time_diffs)
+                else:
+                    info_data['average_propagation_time'] = 0
+            except Exception as e:
+                print(f"Error calculating propagation time for '{info}': {e}")
+                info_data['average_propagation_time'] = 0
+    
     return combined_metrics
 
 if __name__ == "__main__":
     # Change manually to the path 
-    base_metrics_file = "/Users/adonaivera/Documents/emergent_agentics/environment/frontend_server/storage/"
-    test_prefix = "costume_night_final-s-"
+    base_metrics_file = "environment/frontend_server/storage/"
+    test_prefix = "custome_party0-s-"
     output_dir = "visualizations"
     
     # Find all relevant folders
