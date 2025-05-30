@@ -659,7 +659,7 @@ def combine_metrics(folders: List[str]) -> Dict:
 if __name__ == "__main__":
     # Change manually to the path 
     base_metrics_file = "environment/frontend_server/storage/"
-    test_prefix = "custome_party0-s-"
+    test_prefix = "informal_house_party-s-"
     output_dir = "visualizations"
     
     # Find all relevant folders
