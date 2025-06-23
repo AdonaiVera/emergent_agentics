@@ -95,6 +95,11 @@ The party environment is modeled as a tree-structured space with distinct zones:
 
 ## Setting Up The Environment
 
+### Generate environment
+To created the image in your environment run this code.
+```bash
+   python tools/generate_env_images.py
+```
 ### Step 1. Conda Env
 
 Note: If you change the environment name from `simulacra`, you'll need to update the name in the upcoming bash scripts as well.
