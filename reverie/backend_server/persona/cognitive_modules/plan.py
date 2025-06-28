@@ -31,6 +31,13 @@ from persona.prompt_template.run_gpt_prompt import (
     run_gpt_prompt_decide_to_talk,
     run_gpt_prompt_decide_to_react,
     run_gpt_prompt_summarize_conversation,
+    # CoT versions
+    run_gpt_prompt_task_decomp_cot,
+    run_gpt_prompt_action_sector_cot,
+    run_gpt_prompt_action_arena_cot,
+    run_gpt_prompt_action_game_object_cot,
+    run_gpt_prompt_decide_to_talk_cot,
+    run_gpt_prompt_decide_to_react_cot,
 )
 from persona.prompt_template.gpt_structure import ChatGPT_single_request, get_embedding
 from persona.cognitive_modules.retrieve import new_retrieve
@@ -210,93 +217,88 @@ def generate_hourly_schedule(persona, wake_up_hour):
 
 def generate_task_decomp(persona, task, duration):
     """
-    A few shot decomposition of a task given the task description
-
-    Persona state: identity stable set, curr_date_str, first_name
+    Given a task and its duration, this function decomposes it into smaller
+    subtasks. The decomposition is done in 5-minute increments.
 
     INPUT:
         persona: The Persona class instance
-        task: the description of the task at hand in str form
-              (e.g., "waking up and starting her morning routine")
-        duration: an integer that indicates the number of minutes this task is
-                  meant to last (e.g., 60)
+        task: The task description (e.g., "working on her painting")
+        duration: The duration in minutes (e.g., 180)
     OUTPUT:
-        a list of list where the inner list contains the decomposed task
-        description and the number of minutes the task is supposed to last.
+        a list of subtasks with their durations in minutes
     EXAMPLE OUTPUT:
-        [['going to the bathroom', 5], ['getting dressed', 5],
-          ['eating breakfast', 15], ['checking her email', 5],
-          ['getting her supplies ready for the day', 15],
-          ['starting to work on her painting', 15]]
-
+        [['reviewing the kindergarten curriculum standards', 15],
+         ['brainstorming ideas for the lesson', 30],
+         ['creating the lesson plan', 30],
+         ['creating materials for the lesson', 30],
+         ['taking a break', 15],
+         ['reviewing the lesson plan', 30],
+         ['making final changes to the lesson plan', 15],
+         ['printing the lesson plan', 10],
+         ['putting the lesson plan in her bag', 5]]
     """
     if debug:
         print("GNS FUNCTION: <generate_task_decomp>")
-    return run_gpt_prompt_task_decomp(persona, task, duration)[0]
+    return run_gpt_prompt_task_decomp_cot(persona, task, duration)[0]
 
 
 def generate_action_sector(act_desp, persona, maze):
-    """TODO
-    Given the persona and the task description, choose the action_sector.
-
-    Persona state: identity stable set, n-1 day schedule, daily plan
+    """
+    Given an action description, this function determines which sector
+    the persona should go to perform this action.
 
     INPUT:
-        act_desp: description of the new action (e.g., "sleeping")
+        act_desp: The action description (e.g., "working on her painting")
         persona: The Persona class instance
+        maze: The Maze class instance
     OUTPUT:
-        action_arena (e.g., "bedroom 2")
+        a string indicating the sector where the action should take place
     EXAMPLE OUTPUT:
-        "bedroom 2"
+        "double studio"
     """
     if debug:
         print("GNS FUNCTION: <generate_action_sector>")
-    return run_gpt_prompt_action_sector(act_desp, persona, maze)[0]
+    return run_gpt_prompt_action_sector_cot(act_desp, persona, maze)[0]
 
 
-def generate_action_arena(act_desp, persona, maze, act_world, act_sector):
-    """TODO
-    Given the persona and the task description, choose the action_arena.
-
-    Persona state: identity stable set, n-1 day schedule, daily plan
+def generate_action_arena(act_desp, persona, act_world, act_sector):
+    """
+    Given an action description and sector, this function determines which
+    arena within that sector the persona should go to perform this action.
 
     INPUT:
-        act_desp: description of the new action (e.g., "sleeping")
+        act_desp: The action description (e.g., "working on her painting")
         persona: The Persona class instance
+        act_world: The world where the action takes place
+        act_sector: The sector where the action takes place
     OUTPUT:
-        action_arena (e.g., "bedroom 2")
+        a string indicating the arena where the action should take place
     EXAMPLE OUTPUT:
-        "bedroom 2"
+        "studio"
     """
     if debug:
         print("GNS FUNCTION: <generate_action_arena>")
-    return run_gpt_prompt_action_arena(act_desp, persona, act_world, act_sector)[0]
+    return run_gpt_prompt_action_arena_cot(act_desp, persona, act_world, act_sector)[0]
 
 
 def generate_action_game_object(act_desp, act_address, persona, maze):
-    """TODO
-    Given the action description and the act address (the address where
-    we expect the action to task place), choose one of the game objects.
-
-    Persona state: identity stable set, n-1 day schedule, daily plan
+    """
+    Given an action description and address, this function determines which
+    game object the persona should interact with to perform this action.
 
     INPUT:
-        act_desp: the description of the action (e.g., "sleeping")
-        act_address: the arena where the action will take place:
-                    (e.g., "dolores double studio:double studio:bedroom 2")
+        act_desp: The action description (e.g., "working on her painting")
+        act_address: The address where the action takes place
         persona: The Persona class instance
+        maze: The Maze class instance
     OUTPUT:
-        act_game_object:
+        a string indicating the game object to interact with
     EXAMPLE OUTPUT:
-        "bed"
+        "easel"
     """
     if debug:
         print("GNS FUNCTION: <generate_action_game_object>")
-    if not persona.s_mem.get_str_accessible_arena_game_objects(act_address):
-        print("ERROR: act_address not valid. Returning '<random>' as game object.")
-        print("act_address:", act_address)
-        return "<random>"
-    return run_gpt_prompt_action_game_object(act_desp, persona, act_address)[0]
+    return run_gpt_prompt_action_game_object_cot(act_desp, persona, act_address)[0]
 
 
 def generate_action_pronunciatio(act_desp, persona):
@@ -395,7 +397,18 @@ def generate_convo_summary(persona, convo):
 
 
 def generate_decide_to_talk(init_persona, target_persona, retrieved):
-    x = run_gpt_prompt_decide_to_talk(init_persona, target_persona, retrieved)[0]
+    """
+    Determines whether the initiating persona should start a conversation
+    with the target persona based on the current context and retrieved memories.
+
+    INPUT:
+        init_persona: The Persona instance who would initiate the conversation
+        target_persona: The Persona instance who would be the target
+        retrieved: Retrieved memories and context
+    OUTPUT:
+        True if the conversation should be initiated, False otherwise
+    """
+    x = run_gpt_prompt_decide_to_talk_cot(init_persona, target_persona, retrieved)[0]
     if debug:
         print("GNS FUNCTION: <generate_decide_to_talk>")
 
@@ -406,8 +419,19 @@ def generate_decide_to_talk(init_persona, target_persona, retrieved):
 
 
 def generate_decide_to_react(init_persona, target_persona, retrieved): 
+    """
+    Determines how the initiating persona should react when encountering
+    the target persona who is using a shared resource.
+
+    INPUT:
+        init_persona: The Persona instance who needs to decide on a reaction
+        target_persona: The Persona instance who is currently using the resource
+        retrieved: Retrieved memories and context
+    OUTPUT:
+        "1" if the persona should wait, "2" if they should continue
+    """
     if debug: print ("GNS FUNCTION: <generate_decide_to_react>")
-    return run_gpt_prompt_decide_to_react(init_persona, target_persona, retrieved)[0]
+    return run_gpt_prompt_decide_to_react_cot(init_persona, target_persona, retrieved)[0]
 
 
 def generate_new_decomp_schedule(persona, inserted_act, inserted_act_dur,  start_hour, end_hour): 
@@ -723,7 +747,7 @@ def _determine_action(persona, maze):
     act_sector = generate_action_sector(act_desp, persona, maze)
     print("🔵 [DEBUG] Action sector:", act_sector)
     
-    act_arena = generate_action_arena(act_desp, persona, maze, act_world, act_sector)
+    act_arena = generate_action_arena(act_desp, persona, act_world, act_sector)
     print("🔵 [DEBUG] Action arena:", act_arena)
     
     act_address = f"{act_world}:{act_sector}:{act_arena}"

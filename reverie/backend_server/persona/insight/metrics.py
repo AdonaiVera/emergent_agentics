@@ -54,7 +54,7 @@ class PartyMetrics:
         if agent_name not in self.last_zone_update:
             self.last_zone_update[agent_name] = None
             
-    def track_information_spread(self, source: str, target: str, information: str):
+    def track_information_spread(self, source: str, target: str, information: str, thought: str = None):
         """Track how information spreads between agents."""
         if target not in self.information_spread:
             self.initialize_agent(target)
@@ -64,6 +64,7 @@ class PartyMetrics:
             "source": source,
             "target": target,
             "information": information,
+            "thought": thought,
             "timestamp": datetime.now().isoformat()
         })
         
@@ -76,6 +77,7 @@ class PartyMetrics:
             "step": self.current_step,
             "source": source,
             "target": target,
+            "thought": thought,
             "timestamp": datetime.now().isoformat()
         })
         

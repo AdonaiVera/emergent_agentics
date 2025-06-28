@@ -31,6 +31,8 @@ party_topic = "It's a Speed Friending night designed to help guests meet as many
 
 party_topic = "It's a relaxed 'Karaoke and Chill' night with music playing in the background, a makeshift stage in the living room, and people casually taking turns on the mic while others hang out in the kitchen or lounge on the couch."
 
+waiting_medical_room = "It's a quiet doctor's office waiting room with soft lighting, rows of chairs along the walls, and a small table holding magazines. People sit silently checking their phones or flipping through brochures, occasionally glancing at the reception desk as they wait to be called in"
+
 def create_prompt(prompt_input: dict[str, Any]):
     identity_stable_set = prompt_input["identity_stable_set"]
     lifestyle = prompt_input["lifestyle"]

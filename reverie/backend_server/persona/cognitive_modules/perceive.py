@@ -3,6 +3,9 @@ Author: Joon Sung Park (joonspk@stanford.edu)
 
 File: perceive.py
 Description: This defines the "Perceive" module for generative agents. 
+
+Modified by: Adonai Vera (adonai.vera@gmail.com)
+Date: 2025-06-23
 """
 
 import sys

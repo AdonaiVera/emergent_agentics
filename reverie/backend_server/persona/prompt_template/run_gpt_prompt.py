@@ -17,9 +17,16 @@ from .safety.anthromorphosization_v1 import run_gpt_generate_safety_score  # noq
 from .v1.action_location_arena_vMar11 import run_gpt_prompt_action_arena  # noqa: F401
 from .v1.action_location_sector_v1 import run_gpt_prompt_action_sector  # noqa: F401
 from .v1.action_object_v2 import run_gpt_prompt_action_game_object  # noqa: F401
+# CoT versions of planning prompts
+from .v1.action_location_arena_v2_cot import run_gpt_prompt_action_arena as run_gpt_prompt_action_arena_cot  # noqa: F401
+from .v1.action_location_sector_v2_cot import run_gpt_prompt_action_sector as run_gpt_prompt_action_sector_cot  # noqa: F401
+from .v1.action_object_v3_cot import run_gpt_prompt_action_game_object as run_gpt_prompt_action_game_object_cot  # noqa: F401
 from .v2.daily_planning_v6 import run_gpt_prompt_daily_plan  # noqa: F401
 from .v2.decide_to_react_v1 import run_gpt_prompt_decide_to_react  # noqa: F401
 from .v2.decide_to_talk_v2 import run_gpt_prompt_decide_to_talk  # noqa: F401
+# CoT versions of decision prompts
+from .v2.decide_to_react_v2_cot import run_gpt_prompt_decide_to_react as run_gpt_prompt_decide_to_react_cot  # noqa: F401
+from .v2.decide_to_talk_v3_cot import run_gpt_prompt_decide_to_talk as run_gpt_prompt_decide_to_talk_cot  # noqa: F401
 from .v2.generate_event_triple_v1 import (
   run_gpt_prompt_event_triple,  # noqa: F401
   run_gpt_prompt_act_obj_event_triple,  # noqa: F401
@@ -30,8 +37,19 @@ from .v2.insight_and_evidence_v1 import run_gpt_prompt_insight_and_guidance  # n
 from .v2.new_decomp_schedule_v1 import run_gpt_prompt_new_decomp_schedule  # noqa: F401
 from .v2.planning_thought_on_convo_v1 import run_gpt_prompt_planning_thought_on_convo  # noqa: F401
 from .v2.task_decomp_v3 import run_gpt_prompt_task_decomp  # noqa: F401
+# CoT version of task decomposition
+from .v2.task_decomp_v4_cot import run_gpt_prompt_task_decomp as run_gpt_prompt_task_decomp_cot  # noqa: F401
+# CoT versions of retrieval prompts
+from .v2.memory_retrieval_v1_cot import run_gpt_prompt_memory_retrieval as run_gpt_prompt_memory_retrieval_cot  # noqa: F401
+from .v2.relevance_scoring_v1_cot import run_gpt_prompt_relevance_scoring as run_gpt_prompt_relevance_scoring_cot  # noqa: F401
+from .v2.importance_scoring_v1_cot import run_gpt_prompt_importance_scoring as run_gpt_prompt_importance_scoring_cot  # noqa: F401
+# CoT versions of reflection prompts
+from .v2.planning_thought_on_convo_v2_cot import run_gpt_prompt_planning_thought_on_convo as run_gpt_prompt_planning_thought_on_convo_cot  # noqa: F401
+from .v2.generate_focal_pt_v2_cot import run_gpt_prompt_focal_pt as run_gpt_prompt_focal_pt_cot  # noqa: F401
+from .v2.insight_and_evidence_v2_cot import run_gpt_prompt_insight_and_guidance as run_gpt_prompt_insight_and_guidance_cot  # noqa: F401
 from .v2.wake_up_hour_v1 import run_gpt_prompt_wake_up_hour  # noqa: F401
 from .v2.whisper_inner_thought_v1 import run_gpt_prompt_generate_whisper_inner_thought  # noqa: F401
+from .v2.multimodal_whisper_inner_thought_v1 import run_gpt_prompt_generate_multimodal_whisper_inner_thought  # noqa: F401
 from .v3_ChatGPT.generate_focal_pt_v1 import run_gpt_prompt_focal_pt  # noqa: F401
 from .v3_ChatGPT.generate_obj_event_v1 import run_gpt_prompt_act_obj_desc  # noqa: F401
 from .v3_ChatGPT.generate_pronunciatio_v1 import run_gpt_prompt_pronunciatio  # noqa: F401

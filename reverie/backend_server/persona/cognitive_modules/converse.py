@@ -7,6 +7,10 @@ Description: An extra cognitive module for generating conversations.
 import datetime
 import traceback
 import random
+import base64
+import os
+from PIL import Image
+import io
 
 import sys
 sys.path.append('../')
@@ -22,6 +26,7 @@ from persona.prompt_template.run_gpt_prompt import (
     run_gpt_prompt_summarize_ideas,
     run_gpt_prompt_generate_next_convo_line,
     run_gpt_prompt_generate_whisper_inner_thought,
+    run_gpt_prompt_generate_multimodal_whisper_inner_thought,
     run_gpt_generate_safety_score,
     run_gpt_generate_iterative_chat_utt,
 )
@@ -382,3 +387,123 @@ def generate_whisper_conversation(target_persona, message, curr_time):
     )
       
     return thought
+
+def generate_multimodal_whisper_conversation(target_persona, message, image_path, curr_time):
+    """
+    Generate a multimodal whisper conversation that includes both text and image.
+    
+    Args:
+        target_persona: The target agent
+        message: The text message to whisper
+        image_path: Path to the image file
+        curr_time: Current simulation time
+        
+    Returns:
+        thought: The generated inner thought (same format as original)
+    """
+    # Generate inner thought for the whisper (this is the most important part)
+    # Now using the multimodal version that can process both text and image
+    thought = generate_multimodal_inner_thought(target_persona, message, image_path)
+    
+    # Create the whisper event (same as original)
+    created = curr_time
+    expiration = curr_time + datetime.timedelta(days=30)
+    s, p, o = generate_action_event_triple(thought, target_persona)
+    keywords = set([s, p, o])
+    thought_poignancy = generate_poig_score(target_persona, "event", message)
+    thought_embedding_pair = (thought, get_embedding(thought))
+    
+    # Add to target's memory (same as original)
+    target_persona.a_mem.add_thought(
+        created, expiration, s, p, o,
+        thought, keywords, thought_poignancy,
+        thought_embedding_pair, None
+    )
+    
+    # TODO: In the future, you could enhance this to:
+    # 1. Analyze the image content using vision models
+    # 2. Combine image and text information for richer thought generation
+    # 3. Store image metadata or embeddings in the agent's memory
+    # 4. Track multimodal information spread in metrics
+    
+    return thought
+
+def prepare_image_for_openai_vision(image_path):
+    """
+    Convert an image to base64 format for OpenAI Vision API.
+    
+    Args:
+        image_path: Path to the image file
+        
+    Returns:
+        str: Base64 encoded image string
+    """
+    try:
+        # Open and resize image if needed (OpenAI has size limits)
+        with Image.open(image_path) as img:
+            # Convert to RGB if necessary
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # Resize if image is too large (OpenAI recommends max 20MB)
+            max_size = (1024, 1024)  # Reasonable size for API
+            if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
+                img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            return img_base64
+            
+    except Exception as e:
+        print(f"Error processing image {image_path}: {e}")
+        return None
+
+
+def generate_multimodal_inner_thought(persona, text_message, image_path=None):
+    """
+    Generate inner thought based on both text and image input.
+    
+    Args:
+        persona: The persona instance
+        text_message: The text message/whisper
+        image_path: Optional path to image file
+        
+    Returns:
+        str: Generated inner thought
+    """
+    print(f"🔍 [INNER_THOUGHT] Starting inner thought generation for {persona.scratch.name}")
+    print(f"📝 [INNER_THOUGHT] Text message: {text_message}")
+    print(f"🖼️ [INNER_THOUGHT] Image path: {image_path}")
+    
+    # If no image provided, fall back to text-only thought generation
+    if image_path is None or not os.path.exists(image_path):
+        print(f"⚠️ [INNER_THOUGHT] No valid image, falling back to text-only generation")
+        return generate_inner_thought(persona, text_message)
+    
+    print(f"✅ [INNER_THOUGHT] Image exists, proceeding with multimodal generation")
+    
+    # Prepare image for OpenAI Vision API
+    image_base64 = prepare_image_for_openai_vision(image_path)
+    if image_base64 is None:
+        # Fall back to text-only if image processing fails
+        print(f"❌ [INNER_THOUGHT] Image processing failed, falling back to text-only")
+        return generate_inner_thought(persona, text_message)
+    
+    print(f"✅ [INNER_THOUGHT] Image processed successfully, base64 length: {len(image_base64)}")
+    
+    # Use the new multimodal prompt template
+    try:
+        print(f"🤖 [INNER_THOUGHT] Calling multimodal GPT prompt...")
+        thought = run_gpt_prompt_generate_multimodal_whisper_inner_thought(
+            persona, text_message, image_path
+        )[0]
+        print(f"✅ [INNER_THOUGHT] Multimodal thought generation successful")
+        return thought
+    except Exception as e:
+        print(f"❌ [INNER_THOUGHT] Error in multimodal thought generation: {e}")
+        # Fall back to text-only if multimodal generation fails
+        print(f"🔄 [INNER_THOUGHT] Falling back to text-only generation")
+        return generate_inner_thought(persona, text_message)
