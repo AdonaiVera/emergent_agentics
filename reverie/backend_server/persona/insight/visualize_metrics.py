@@ -365,34 +365,243 @@ def plot_information_propagation(metrics: Dict, output_path: str):
         plt.savefig(f"{output_path}/propagation_time.png")
         plt.close()
         
-        # For each piece of information, create a network graph showing propagation
-        for info, info_data in metrics['propagation_metrics'].items():
-            if len(info_data['propagation_paths']) > 1:  # Only if there's actual propagation
-                plt.figure(figsize=(12, 10))
-                G = nx.DiGraph()
+    except Exception as e:
+        print(f"Error in plot_information_propagation: {e}")
+
+def plot_multimodal_metrics(metrics: Dict, output_path: str):
+    """Create visualizations for multimodal metrics."""
+    if 'multimodal_metrics' not in metrics:
+        print("No multimodal metrics available")
+        return
+    
+    multimodal = metrics['multimodal_metrics']
+    
+    try:
+        # Plot whisper categories distribution
+        plt.figure(figsize=(15, 10))
+        categories = list(multimodal['whisper_categories'].keys())
+        counts = [multimodal['whisper_categories'][cat]['count'] for cat in categories]
+        
+        # Filter out categories with zero counts for cleaner visualization
+        non_zero_categories = []
+        non_zero_counts = []
+        for cat, count in zip(categories, counts):
+            if count > 0:
+                non_zero_categories.append(cat)
+                non_zero_counts.append(count)
+        
+        if non_zero_counts:
+            plt.bar(range(len(non_zero_categories)), non_zero_counts)
+            plt.title('Whisper Categories Distribution')
+            plt.xlabel('Whisper Categories')
+            plt.ylabel('Count')
+            plt.xticks(range(len(non_zero_categories)), non_zero_categories, rotation=45, ha='right')
+            plt.tight_layout()
+            plt.savefig(f"{output_path}/whisper_categories_distribution.png")
+            plt.close()
+        
+        # Plot vision processing success rates
+        plt.figure(figsize=(10, 6))
+        vision_data = multimodal['vision_processing']
+        labels = ['Successful', 'Failed', 'Fallback to Text']
+        values = [
+            vision_data['successful_image_processing'],
+            vision_data['failed_image_processing'],
+            vision_data['fallback_to_text_only']
+        ]
+        
+        if sum(values) > 0:
+            plt.pie(values, labels=labels, autopct='%1.1f%%', startangle=90)
+            plt.title('Vision Processing Results')
+            plt.axis('equal')
+            plt.savefig(f"{output_path}/vision_processing_results.png")
+            plt.close()
+        
+        # Plot multimodal vs text-only comparison
+        plt.figure(figsize=(12, 8))
+        mm_vs_text = multimodal['multimodal_vs_text']
+        
+        # Create subplots
+        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
+        
+        # Whisper count comparison
+        whisper_types = ['Multimodal', 'Text Only']
+        whisper_counts = [mm_vs_text['multimodal_whispers'], mm_vs_text['text_only_whispers']]
+        ax1.bar(whisper_types, whisper_counts, color=['blue', 'orange'])
+        ax1.set_title('Whisper Types Distribution')
+        ax1.set_ylabel('Count')
+        
+        # Spread rate comparison
+        spread_rates = [mm_vs_text['multimodal_spread_rate'], mm_vs_text['text_only_spread_rate']]
+        ax2.bar(whisper_types, spread_rates, color=['green', 'red'])
+        ax2.set_title('Spread Rate Comparison')
+        ax2.set_ylabel('Spread Rate')
+        
+        # Thought length comparison
+        thought_lengths = [mm_vs_text['multimodal_thought_length'], mm_vs_text['text_only_thought_length']]
+        ax3.bar(whisper_types, thought_lengths, color=['purple', 'brown'])
+        ax3.set_title('Average Thought Length')
+        ax3.set_ylabel('Character Count')
+        
+        # Vision processing success rate
+        success_rate = vision_data['image_processing_success_rate']
+        ax4.pie([success_rate, 1-success_rate], labels=['Success', 'Failure'], autopct='%1.1f%%')
+        ax4.set_title('Vision Processing Success Rate')
+        
+        plt.tight_layout()
+        plt.savefig(f"{output_path}/multimodal_vs_text_comparison.png")
+        plt.close()
+        
+        # Plot whisper sequence analysis
+        if 'whisper_sequence_analysis' in multimodal:
+            sequence_analysis = multimodal['whisper_sequence_analysis']
+            
+            # Whisper frequency over time
+            if 'whisper_frequency_by_step' in sequence_analysis:
+                plt.figure(figsize=(12, 6))
+                steps = sorted(sequence_analysis['whisper_frequency_by_step'].keys())
+                frequencies = [sequence_analysis['whisper_frequency_by_step'][step] for step in steps]
                 
-                # Add all nodes and edges from the propagation paths
-                for path in info_data['propagation_paths']:
-                    if path['source'] not in G:
-                        G.add_node(path['source'])
-                    if path['target'] not in G:
-                        G.add_node(path['target'])
-                    G.add_edge(path['source'], path['target'])
-                
-                # Draw the network
-                pos = nx.spring_layout(G)
-                nx.draw(G, pos, with_labels=True, node_color='lightblue',
-                        node_size=2000, font_size=10, font_weight='bold',
-                        arrows=True, arrowsize=20)
-                plt.title(f'Information Propagation Network: {info[:30]}...' if len(info) > 30 else info)
+                plt.plot(steps, frequencies, marker='o', linewidth=2, markersize=4)
+                plt.title('Whisper Frequency Over Time')
+                plt.xlabel('Simulation Step')
+                plt.ylabel('Number of Whispers')
+                plt.grid(True, alpha=0.3)
                 plt.tight_layout()
-                # Create safe filename by replacing problematic characters
-                safe_info = info.replace(' ', '_').replace("'", "").replace('"', '')[:30]
-                plt.savefig(f"{output_path}/propagation_network_{safe_info}.png")
+                plt.savefig(f"{output_path}/whisper_frequency_timeline.png")
                 plt.close()
+            
+            # Target preferences
+            if 'target_preferences' in sequence_analysis:
+                plt.figure(figsize=(10, 6))
+                targets = list(sequence_analysis['target_preferences'].keys())
+                preferences = list(sequence_analysis['target_preferences'].values())
+                
+                if targets:
+                    plt.bar(range(len(targets)), preferences)
+                    plt.title('Whisper Target Preferences')
+                    plt.xlabel('Target Agents')
+                    plt.ylabel('Number of Whispers Received')
+                    plt.xticks(range(len(targets)), targets, rotation=45, ha='right')
+                    plt.tight_layout()
+                    plt.savefig(f"{output_path}/whisper_target_preferences.png")
+                    plt.close()
+            
+            # Thought length distribution
+            if 'thought_length_distribution' in sequence_analysis:
+                plt.figure(figsize=(10, 6))
+                thought_lengths = sequence_analysis['thought_length_distribution']
+                
+                if thought_lengths:
+                    plt.hist(thought_lengths, bins=20, alpha=0.7, edgecolor='black')
+                    plt.title('Thought Length Distribution')
+                    plt.xlabel('Thought Length (characters)')
+                    plt.ylabel('Frequency')
+                    plt.grid(True, alpha=0.3)
+                    plt.tight_layout()
+                    plt.savefig(f"{output_path}/thought_length_distribution.png")
+                    plt.close()
         
     except Exception as e:
-        print(f"Error plotting information propagation: {e}")
+        print(f"Error in plot_multimodal_metrics: {e}")
+
+def plot_bias_analysis(metrics: Dict, output_path: str):
+    """Create visualizations for bias analysis in multimodal interactions."""
+    if 'multimodal_metrics' not in metrics:
+        print("No multimodal metrics available for bias analysis")
+        return
+    
+    multimodal = metrics['multimodal_metrics']
+    
+    try:
+        # Analyze visual limitations impact
+        visual_limitations = ['VISUAL_LIMITATION_GRAYSCALE', 'VISUAL_LIMITATION_BLURRED', 
+                             'VISUAL_LIMITATION_BLACK', 'VISUAL_LIMITATION_OCCLUDED', 
+                             'VISUAL_LIMITATION_ADVERSARIAL']
+        
+        limitation_counts = []
+        limitation_spread_rates = []
+        
+        for limitation in visual_limitations:
+            if limitation in multimodal['whisper_categories']:
+                data = multimodal['whisper_categories'][limitation]
+                limitation_counts.append(data['count'])
+                limitation_spread_rates.append(data['spread_rate'])
+        
+        if limitation_counts:
+            plt.figure(figsize=(15, 6))
+            
+            # Subplot 1: Count comparison
+            plt.subplot(1, 2, 1)
+            limitation_names = [lim.replace('VISUAL_LIMITATION_', '') for lim in visual_limitations[:len(limitation_counts)]]
+            plt.bar(limitation_names, limitation_counts, color='skyblue')
+            plt.title('Visual Limitations: Whisper Counts')
+            plt.xlabel('Visual Limitation Type')
+            plt.ylabel('Count')
+            plt.xticks(rotation=45, ha='right')
+            
+            # Subplot 2: Spread rate comparison
+            plt.subplot(1, 2, 2)
+            plt.bar(limitation_names, limitation_spread_rates, color='lightcoral')
+            plt.title('Visual Limitations: Spread Rates')
+            plt.xlabel('Visual Limitation Type')
+            plt.ylabel('Spread Rate')
+            plt.xticks(rotation=45, ha='right')
+            
+            plt.tight_layout()
+            plt.savefig(f"{output_path}/visual_limitations_analysis.png")
+            plt.close()
+        
+        # Compare different bias types
+        bias_categories = ['MISMATCHED_EMOTION', 'INVERTED_OBJECT_RECOGNITION', 
+                          'MISMATCH_ACTIONS', 'NEUTRAL_IMAGE_BIASED_CAPTION', 
+                          'VISION_OVERTRUST_AI_GENERATED']
+        
+        bias_counts = []
+        bias_names = []
+        
+        for category in bias_categories:
+            if category in multimodal['whisper_categories']:
+                data = multimodal['whisper_categories'][category]
+                if data['count'] > 0:
+                    bias_counts.append(data['count'])
+                    bias_names.append(category.replace('_', ' ').title())
+        
+        if bias_counts:
+            plt.figure(figsize=(12, 8))
+            plt.bar(bias_names, bias_counts, color=['red', 'orange', 'yellow', 'green', 'blue'])
+            plt.title('Bias Category Analysis')
+            plt.xlabel('Bias Type')
+            plt.ylabel('Count')
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            plt.savefig(f"{output_path}/bias_category_analysis.png")
+            plt.close()
+        
+        # Thought analysis by category
+        plt.figure(figsize=(15, 10))
+        
+        categories_with_thoughts = []
+        avg_thought_lengths = []
+        
+        for category, data in multimodal['whisper_categories'].items():
+            if data['count'] > 0 and data['thoughts']:
+                categories_with_thoughts.append(category.replace('_', ' ').title())
+                avg_length = sum(len(thought['thought']) for thought in data['thoughts']) / len(data['thoughts'])
+                avg_thought_lengths.append(avg_length)
+        
+        if categories_with_thoughts:
+            plt.bar(categories_with_thoughts, avg_thought_lengths, color='purple')
+            plt.title('Average Thought Length by Whisper Category')
+            plt.xlabel('Whisper Category')
+            plt.ylabel('Average Thought Length (characters)')
+            plt.xticks(rotation=45, ha='right')
+            plt.tight_layout()
+            plt.savefig(f"{output_path}/thought_length_by_category.png")
+            plt.close()
+        
+    except Exception as e:
+        print(f"Error in plot_bias_analysis: {e}")
 
 def generate_all_visualizations(metrics_file: str, output_dir: str, test_prefix: str):
     """Generate all visualizations from metrics data."""
@@ -417,6 +626,8 @@ def generate_all_visualizations(metrics_file: str, output_dir: str, test_prefix:
     plot_conversation_analysis(metrics, test_output_dir)
     plot_agent_activity_timeline(metrics, test_output_dir)
     plot_information_propagation(metrics, test_output_dir)
+    plot_multimodal_metrics(metrics, test_output_dir)
+    plot_bias_analysis(metrics, test_output_dir)
 
 def find_metrics_folders(base_path: str, test_prefix: str) -> List[str]:
     """Find all folders matching the pattern test_X-s-Y-* and return their paths."""
@@ -455,7 +666,48 @@ def combine_metrics(folders: List[str]) -> Dict:
         },
         'zone_movements': {},
         'conversation_durations': [],
-        'propagation_metrics': {}
+        'propagation_metrics': {},
+        # New multimodality metrics
+        'multimodal_metrics': {
+            'whisper_categories': {
+                'FAMOUS_PERSON': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'VISUAL_LIMITATION_GRAYSCALE': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'VISUAL_LIMITATION_BLURRED': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'VISUAL_LIMITATION_BLACK': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'VISUAL_LIMITATION_OCCLUDED': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'VISUAL_LIMITATION_ADVERSARIAL': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'MISMATCHED_EMOTION': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'INVERTED_OBJECT_RECOGNITION': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'MISMATCH_ACTIONS': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'NEUTRAL_IMAGE_BIASED_CAPTION': {'count': 0, 'spread_rate': 0.0, 'thoughts': []},
+                'VISION_OVERTRUST_AI_GENERATED': {'count': 0, 'spread_rate': 0.0, 'thoughts': []}
+            },
+            'vision_processing': {
+                'successful_image_processing': 0,
+                'failed_image_processing': 0,
+                'fallback_to_text_only': 0,
+                'image_processing_success_rate': 0.0
+            },
+            'bias_analysis': {
+                'visual_limitations_impact': {},
+                'emotion_mismatch_impact': {},
+                'object_recognition_impact': {},
+                'action_mismatch_impact': {},
+                'caption_bias_impact': {},
+                'ai_generated_trust_impact': {}
+            },
+            'multimodal_vs_text': {
+                'multimodal_whispers': 0,
+                'text_only_whispers': 0,
+                'multimodal_spread_rate': 0.0,
+                'text_only_spread_rate': 0.0,
+                'multimodal_thought_length': 0.0,
+                'text_only_thought_length': 0.0
+            },
+            'whisper_sequence_analysis': [],
+            'image_path_tracking': [],
+            'visual_limitation_performance': {}
+        }
     }
     
     # Track seen conversations to avoid duplicates
@@ -474,8 +726,31 @@ def combine_metrics(folders: List[str]) -> Dict:
                 combined_metrics['information_spread'][agent] = []
             combined_metrics['information_spread'][agent].extend(info)
         
-        # Combine whisper_history
-        combined_metrics['whisper_history'].extend(metrics.get('whisper_history', []))
+        # Combine whisper_history with enhanced analysis
+        for whisper in metrics.get('whisper_history', []):
+            combined_metrics['whisper_history'].append(whisper)
+            
+            # Analyze whisper categories from information content
+            information = whisper.get('information', '')
+            thought = whisper.get('thought', '')
+            
+            # Extract category from information (format: [CATEGORY] message)
+            category = None
+            if information.startswith('[') and ']' in information:
+                category_end = information.find(']')
+                category = information[1:category_end]
+                # Clean up the information to remove category prefix
+                whisper['information'] = information[category_end + 1:].strip()
+            
+            # Track category-specific metrics
+            if category and category in combined_metrics['multimodal_metrics']['whisper_categories']:
+                combined_metrics['multimodal_metrics']['whisper_categories'][category]['count'] += 1
+                combined_metrics['multimodal_metrics']['whisper_categories'][category]['thoughts'].append({
+                    'step': whisper.get('step', 0),
+                    'target': whisper.get('target', ''),
+                    'thought': thought,
+                    'timestamp': whisper.get('timestamp', '')
+                })
         
         # Combine interaction_counts
         for agent, interactions in metrics.get('interaction_counts', {}).items():
@@ -654,12 +929,100 @@ def combine_metrics(folders: List[str]) -> Dict:
                 print(f"Error calculating propagation time for '{info}': {e}")
                 info_data['average_propagation_time'] = 0
     
+    # Calculate multimodal metrics
+    _calculate_multimodal_metrics(combined_metrics)
+    
     return combined_metrics
+
+def _calculate_multimodal_metrics(combined_metrics):
+    """Calculate derived multimodal metrics."""
+    multimodal = combined_metrics['multimodal_metrics']
+    
+    # Calculate spread rates for each whisper category
+    total_whispers = sum(cat['count'] for cat in multimodal['whisper_categories'].values())
+    
+    for category, data in multimodal['whisper_categories'].items():
+        if total_whispers > 0:
+            data['spread_rate'] = data['count'] / total_whispers
+    
+    # Analyze whisper sequence and patterns
+    whisper_history = combined_metrics['whisper_history']
+    multimodal['whisper_sequence_analysis'] = _analyze_whisper_sequence(whisper_history)
+    
+    # Calculate vision processing success rates
+    total_processed = multimodal['vision_processing']['successful_image_processing'] + \
+                     multimodal['vision_processing']['failed_image_processing']
+    if total_processed > 0:
+        multimodal['vision_processing']['image_processing_success_rate'] = \
+            multimodal['vision_processing']['successful_image_processing'] / total_processed
+    
+    # Calculate multimodal vs text-only metrics
+    total_whispers = multimodal['multimodal_vs_text']['multimodal_whispers'] + \
+                     multimodal['multimodal_vs_text']['text_only_whispers']
+    
+    if total_whispers > 0:
+        multimodal['multimodal_vs_text']['multimodal_spread_rate'] = \
+            multimodal['multimodal_vs_text']['multimodal_whispers'] / total_whispers
+        multimodal['multimodal_vs_text']['text_only_spread_rate'] = \
+            multimodal['multimodal_vs_text']['text_only_whispers'] / total_whispers
+    
+    # Calculate average thought lengths
+    multimodal_thoughts = []
+    text_only_thoughts = []
+    
+    for whisper in whisper_history:
+        thought = whisper.get('thought', '')
+        if thought:
+            # Determine if this was multimodal based on information content
+            info = whisper.get('information', '')
+            if any(category in info for category in multimodal['whisper_categories'].keys()):
+                multimodal_thoughts.append(len(thought))
+            else:
+                text_only_thoughts.append(len(thought))
+    
+    if multimodal_thoughts:
+        multimodal['multimodal_vs_text']['multimodal_thought_length'] = sum(multimodal_thoughts) / len(multimodal_thoughts)
+    if text_only_thoughts:
+        multimodal['multimodal_vs_text']['text_only_thought_length'] = sum(text_only_thoughts) / len(text_only_thoughts)
+
+def _analyze_whisper_sequence(whisper_history):
+    """Analyze the sequence and patterns of whispers."""
+    analysis = {
+        'total_whispers': len(whisper_history),
+        'unique_sources': len(set(w.get('source', '') for w in whisper_history)),
+        'unique_targets': len(set(w.get('target', '') for w in whisper_history)),
+        'whisper_frequency_by_step': {},
+        'category_transitions': [],
+        'target_preferences': {},
+        'thought_length_distribution': []
+    }
+    
+    # Analyze whisper frequency by step
+    for whisper in whisper_history:
+        step = whisper.get('step', 0)
+        if step not in analysis['whisper_frequency_by_step']:
+            analysis['whisper_frequency_by_step'][step] = 0
+        analysis['whisper_frequency_by_step'][step] += 1
+    
+    # Analyze target preferences
+    for whisper in whisper_history:
+        target = whisper.get('target', '')
+        if target not in analysis['target_preferences']:
+            analysis['target_preferences'][target] = 0
+        analysis['target_preferences'][target] += 1
+    
+    # Analyze thought length distribution
+    for whisper in whisper_history:
+        thought = whisper.get('thought', '')
+        if thought:
+            analysis['thought_length_distribution'].append(len(thought))
+    
+    return analysis
 
 if __name__ == "__main__":
     # Change manually to the path 
     base_metrics_file = "environment/frontend_server/storage/"
-    test_prefix = "informal_house_party-s-"
+    test_prefix = "party_experiment_1_whisper_1-s-"
     output_dir = "visualizations"
     
     # Find all relevant folders
