@@ -8,7 +8,7 @@ environment/frontend_server/temp_storage*/*
 environment/frontend_server/frontend_server/settings/local.py
 environment/frontend_server/static_dirs/*
 reverie/backend_server/cost-logs/*
-
+reverie/backend_server/whisper_images/famous_people/*
 # Logs folder
 logs/*
 !logs/skip-morning_2024-05-15_13-54-44.txt
@@ -33,6 +33,7 @@ environment/frontend_server/compressed_storage
 environment/frontend_server/storage/*/environment/*
 !environment/frontend_server/storage/*/environment/0.json
 environment/frontend_server/storage/*/movement/
+
 
 bin/
 include/

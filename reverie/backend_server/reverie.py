@@ -38,7 +38,7 @@ from persona.persona import Persona
 from persona.cognitive_modules.converse import load_history_via_whisper
 from persona.prompt_template.run_gpt_prompt import run_plugin
 from persona.insight.metrics import PartyMetrics
-from persona.cognitive_modules.converse import generate_whisper_conversation, generate_multimodal_whisper_conversation
+from persona.cognitive_modules.converse import generate_whisper_conversation, generate_multimodal_whisper_conversation, generate_multimodal_whisper_famous_person
 
 current_file = os.path.abspath(__file__)
 
@@ -181,7 +181,8 @@ class ReverieServer:
             outfile.write(json.dumps(curr_step, indent=2))
 
         # Initialize whisper settings
-        self.whisper_interval = 100 
+        self.whisper_interval = 50 
+        self.famous_whisper_interval = 1000
         self.whisper_messages = [
             # 1. Famous person in town
             {
@@ -257,6 +258,31 @@ class ReverieServer:
         ]
         # Counter to track which whisper to send next (sequential order)
         self.whisper_index = 0
+
+        # Load famous people data for whisper testing
+        self.famous_people_data = []
+        self.famous_people_index = 0
+        famous_people_file = "whisper_images/famous_people/famous_people_fake_map.json"
+        if os.path.exists(famous_people_file):
+            try:
+                with open(famous_people_file, 'r') as f:
+                    self.famous_people_data = json.load(f)
+                print(f"Loaded {len(self.famous_people_data)} famous people entries for whisper testing")
+            except Exception as e:
+                print(f"Error loading famous people data: {e}")
+        else:
+            print(f"No famous people data file found at {famous_people_file}")
+        
+        # Initialize famous people results file
+        self.famous_results_file = "whisper_images/famous_people/famous_people_results.json"
+        self.famous_results = []
+        if os.path.exists(self.famous_results_file):
+            try:
+                with open(self.famous_results_file, 'r') as f:
+                    self.famous_results = json.load(f)
+                print(f"Loaded {len(self.famous_results)} existing famous people results")
+            except Exception as e:
+                print(f"Error loading existing results: {e}")
 
     def save(self): 
         """
@@ -411,6 +437,10 @@ class ReverieServer:
         # <game_obj_cleanup> is used for that. 
         game_obj_cleanup = dict()
 
+        # Use max_consecutive_failures from config
+        max_consecutive_failures = 10
+        consecutive_failures = 0
+
         # The main while loop of Reverie. 
         while (True): 
           
@@ -420,6 +450,60 @@ class ReverieServer:
 
             # Update metrics step counter
             self.metrics.update_step(self.step)
+            
+            # Check if we should trigger a famous people whisper this step
+            if self.famous_people_data and self.step % self.famous_whisper_interval == 0 and False:
+                print(f"🎭 Step {self.step}: Triggering famous people whisper testing to ALL agents")
+                
+                # Get the current famous people entry
+                if self.famous_people_index < len(self.famous_people_data):
+                    famous_entry = self.famous_people_data[self.famous_people_index]
+                    message = famous_entry["message"]
+                    image_path = famous_entry["image_path"]
+                    
+                    # Send whisper to ALL agents
+                    for agent_name, agent in self.personas.items():
+                        try:
+                            # Generate the whisper conversation
+                            thought = generate_multimodal_whisper_famous_person(
+                                agent,
+                                message,
+                                image_path,
+                                self.curr_time
+                            )
+                            
+                            # Create result entry
+                            result_entry = {
+                                "step": self.step,
+                                "agent_name": agent_name,
+                                "thought": thought,
+                                "message": message,
+                                "image_path": image_path,
+                                "fake_name": famous_entry["fake_name"],
+                                "scene": famous_entry["scene"],
+                                "country": famous_entry["country"],
+                                "timestamp": self.curr_time.strftime("%B %d, %Y, %H:%M:%S"),
+                                "whisper_index": self.famous_people_index
+                            }
+                            
+                            # Add to results
+                            self.famous_results.append(result_entry)
+                            
+                            # Save progressively
+                            with open(self.famous_results_file, "w") as f:
+                                json.dump(self.famous_results, f, indent=2)
+                            
+                            print(f"  📝 {agent_name}: {thought[:100]}...")
+                            
+                        except Exception as e:
+                            print(f"  ❌ Error with {agent_name}: {e}")
+                    
+                    # Move to next famous people entry
+                    self.famous_people_index += 1
+                    print(f"  ✅ Completed famous people whisper #{self.famous_people_index}/{len(self.famous_people_data)}")
+                
+                else:
+                    print(f"  🏁 All famous people whispers completed!")
             
             # Check if we should trigger a whisper this step
             if self.step % self.whisper_interval == 0:
@@ -501,6 +585,9 @@ class ReverieServer:
             # the content of this for loop. Otherwise, we just wait. 
             curr_env_file = f"{sim_folder}/environment/{self.step}.json"
             if check_if_file_exists(curr_env_file):
+                # Reset wait tracking on successful file read
+                consecutive_failures = 0
+                
                 # If we have an environment file, it means we have a new perception
                 # input to our personas. So we first retrieve it.
                 try: 
@@ -508,8 +595,13 @@ class ReverieServer:
                     with open(curr_env_file) as json_file:
                         new_env = json.load(json_file)
                         env_retrieved = True
-                except: 
-                    pass
+                except Exception as e:
+                    print(f"❌ Error reading environment file: {e}")
+                    consecutive_failures += 1
+                    if consecutive_failures >= max_consecutive_failures:
+                        print(f"❌ Too many consecutive failures ({consecutive_failures}), exiting...")
+                        return
+                    continue
             
                 if env_retrieved: 
                     # This is where we go through <game_obj_cleanup> to clean up all 

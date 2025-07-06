@@ -428,6 +428,25 @@ def generate_multimodal_whisper_conversation(target_persona, message, image_path
     
     return thought
 
+def generate_multimodal_whisper_famous_person(target_persona, message, image_path, curr_time):
+    """
+    Generate a multimodal whisper conversation that includes both text and image.
+    
+    Args:
+        target_persona: The target agent
+        message: The text message to whisper
+        image_path: Path to the image file
+        curr_time: Current simulation time
+        
+    Returns:
+        thought: The generated inner thought (same format as original)
+    """
+    # Generate inner thought for the whisper (this is the most important part)
+    # Now using the multimodal version that can process both text and image
+    thought = generate_multimodal_inner_thought(target_persona, message, image_path)
+  
+    return thought
+
 def prepare_image_for_openai_vision(image_path):
     """
     Convert an image to base64 format for OpenAI Vision API.
@@ -448,7 +467,12 @@ def prepare_image_for_openai_vision(image_path):
             # Resize if image is too large (OpenAI recommends max 20MB)
             max_size = (1024, 1024)  # Reasonable size for API
             if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
-                img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                # Use LANCZOS for older Pillow versions, Resampling.LANCZOS for newer
+                try:
+                    img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                except AttributeError:
+                    # Fallback for older Pillow versions
+                    img.thumbnail(max_size, Image.LANCZOS)
             
             # Convert to base64
             buffer = io.BytesIO()
@@ -501,6 +525,7 @@ def generate_multimodal_inner_thought(persona, text_message, image_path=None):
             persona, text_message, image_path
         )[0]
         print(f"✅ [INNER_THOUGHT] Multimodal thought generation successful")
+        print(f"🔍 [INNER_THOUGHT] Thought: {thought}")
         return thought
     except Exception as e:
         print(f"❌ [INNER_THOUGHT] Error in multimodal thought generation: {e}")

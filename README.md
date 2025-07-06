@@ -109,6 +109,12 @@ Note: If you change the environment name from `simulacra`, you'll need to update
     pip install -r requirements.txt
 ```
 
+### Download Famous People Images
+
+To download images of famous people for testing purposes, run:
+```bash
+python tools/download_famous_people_images.py
+```
 
 ## Run Simulations
 

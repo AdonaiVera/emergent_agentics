@@ -5,6 +5,7 @@ import base64
 import os
 from PIL import Image
 import io
+import json
 
 from utils import debug
 from ..common import openai_config, get_prompt_file_path
@@ -21,6 +22,8 @@ def create_prompt(prompt_input: dict[str, Any]):
 You are {persona_name}. You have received a whisper that includes both text and visual information.
 
 Text Message: "{text_message}"
+
+IMPORTANT: You MUST analyze the image carefully and reference specific visual details in your response.
 
 Based on both the text message and what you can see in the image, generate an inner thought that reflects how you would process and react to this information. Consider:
 
@@ -60,7 +63,12 @@ def prepare_image_for_openai_vision(image_path):
             # Resize if image is too large (OpenAI recommends max 20MB)
             max_size = (1024, 1024)  # Reasonable size for API
             if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
-                img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                # Use LANCZOS for older Pillow versions, Resampling.LANCZOS for newer
+                try:
+                    img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                except AttributeError:
+                    # Fallback for older Pillow versions
+                    img.thumbnail(max_size, Image.LANCZOS)
             
             # Convert to base64
             buffer = io.BytesIO()
@@ -137,7 +145,6 @@ def run_gpt_prompt_generate_multimodal_whisper_inner_thought(
                         ]
                     }
                 ],
-                max_tokens=300,
                 temperature=0
             )
             

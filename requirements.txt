@@ -119,4 +119,4 @@ yarl==1.8.2
 yellowbrick==1.5
 zipp==3.6.0
 networkx>=2.6.0
-
+duckduckgo-search==8.0.3
