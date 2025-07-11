@@ -183,6 +183,11 @@ class ReverieServer:
         # Initialize whisper settings
         self.whisper_interval = 50 
         self.famous_whisper_interval = 1000
+        
+        # Number of agents to receive each whisper message (configurable)
+        # Set this to 1 for single agent whispers, 2 for two agents, etc.
+        # The system will automatically adjust if there are fewer agents available
+        self.whisper_target_count = 2
         self.whisper_messages = [
             # 1. Famous person in town
             {
@@ -312,6 +317,8 @@ class ReverieServer:
         reverie_meta["persona_names"] = list(self.personas.keys())
         reverie_meta["step"] = self.step
         reverie_meta["block_remaps"] = self.block_remaps
+        reverie_meta["whisper_interval"] = self.whisper_interval
+        reverie_meta["whisper_target_count"] = self.whisper_target_count
         reverie_meta_f = f"{sim_folder}/reverie/meta.json"
         with open(reverie_meta_f, "w") as outfile: 
             outfile.write(json.dumps(reverie_meta, indent=2))
@@ -507,9 +514,18 @@ class ReverieServer:
             
             # Check if we should trigger a whisper this step
             if self.step % self.whisper_interval == 0:
-                # Select random target agent
-                target_name = random.choice(list(self.personas.keys()))
-                target = self.personas[target_name]
+                # Select random target agents (ensure we don't exceed available agents)
+                available_agents = list(self.personas.keys())
+                num_targets = min(self.whisper_target_count, len(available_agents))
+                
+                # Log if we had to adjust the number of targets
+                if num_targets < self.whisper_target_count:
+                    print(f"⚠️  Adjusted whisper targets from {self.whisper_target_count} to {num_targets} (only {len(available_agents)} agents available)")
+                
+                target_names = random.sample(available_agents, num_targets)
+                
+                # Print validation of selected agents
+                print(f"🎯 Step {self.step}: Selected {len(target_names)} agent(s) for whisper: {', '.join(target_names)}")
                 
                 # Select the next whisper in sequential order
                 whisper_data = self.whisper_messages[self.whisper_index]
@@ -519,14 +535,6 @@ class ReverieServer:
                 
                 # Define whisper_number early to avoid UnboundLocalError
                 whisper_number = self.whisper_index + 1
-                
-                # Generate the whisper conversation
-                thought = generate_multimodal_whisper_conversation(
-                    target,
-                    message,
-                    image_path,
-                    self.curr_time
-                )
                 
                 # Track the whisper in metrics using existing functions
                 # Determine category for metrics tracking
@@ -546,11 +554,23 @@ class ReverieServer:
                 elif whisper_number == 11:
                     category_info = "VISION_OVERTRUST_AI_GENERATED"
 
-                print(f"💬 Whisper message: {message} | 🧠 Whisper thought: {thought}")
-                
-                # Include category in the information for metrics tracking
-                enhanced_message = f"[{category_info}] {message}"
-                self.metrics.track_information_spread("system", target_name, enhanced_message, thought)
+                # Send whisper to each selected agent
+                for target_name in target_names:
+                    target = self.personas[target_name]
+                    
+                    # Generate the whisper conversation
+                    thought = generate_multimodal_whisper_conversation(
+                        target,
+                        message,
+                        image_path,
+                        self.curr_time
+                    )
+
+                    print(f"💬 Whisper message: {message} | 🧠 Whisper thought: {thought}")
+                    
+                    # Include category in the information for metrics tracking
+                    enhanced_message = f"[{category_info}] {message}"
+                    self.metrics.track_information_spread("system", target_name, enhanced_message, thought)
                 
                 # Log the whisper with category and visual limitation info
                 category_info = ""
@@ -572,9 +592,9 @@ class ReverieServer:
                     category_info = "[VISION OVERTRUST - AI GENERATED]"
                 
                 if image_path:
-                    print(f"Step {self.step}: System whispered to {target_name} (whisper #{whisper_number}) {category_info}: {message} (with image: {image_path})")
+                    print(f"Step {self.step}: System whispered to {', '.join(target_names)} (whisper #{whisper_number}) {category_info}: {message} (with image: {image_path})")
                 else:
-                    print(f"Step {self.step}: System whispered to {target_name} (whisper #{whisper_number}) {category_info}: {message} (text-only)")
+                    print(f"Step {self.step}: System whispered to {', '.join(target_names)} (whisper #{whisper_number}) {category_info}: {message} (text-only)")
                 
                 # Update whisper index for next iteration (cycle through the list)
                 self.whisper_index = (self.whisper_index + 1) % len(self.whisper_messages)
