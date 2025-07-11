@@ -132,11 +132,11 @@ Example:
 ```bash
     ./run_backend_automatic.sh --conda_path /opt/anaconda3/bin/activate --env_name simulacra -o base_party -t test_1 -s 400 --ui True
 
-    # Example
-    ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_1_whisper_2 -s 800 --ui True
-    ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_1_whisper_5 -s 800 --ui True
-    ./run_backend_automatic.sh --env_name simulacra -o base_party -t medical_experiment_1_whisper_2 -s 800 --ui True
-    ./run_backend_automatic.sh --env_name simulacra -o base_party -t medical_experiment_1_whisper_5 -s 800 --ui True
+    # Example without UI
+    ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_1_whisper_2 -s 800 
+    ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_1_whisper_5 -s 800 
+    ./run_backend_automatic.sh --env_name simulacra -o base_party -t medical_experiment_1_whisper_2 -s 800 
+    ./run_backend_automatic.sh --env_name simulacra -o base_party -t medical_experiment_1_whisper_5 -s 800 
 ```
 
 
@@ -179,5 +179,7 @@ This project was developed as part of the Complex Systems course under the guida
 
 ### Team Members
 - Adonai Vera
+- Carlos Hinojosa
+- Karen Sanchez 
 - Prateek Kharangate
 - Haidar Bin Hamid

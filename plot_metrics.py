@@ -15,8 +15,8 @@ def example_usage():
     
     # Example JSON file paths (replace with your actual files)
     json_files = [
-        "visualizations/party_experiment_2_whisper_1-s-/party_experiment_2_whisper_1-s-combined_metrics.json",
-        "visualizations/informal_house_party-s-/informal_house_party-s-combined_metrics.json"
+        "visualizations/SECOND_SIMULATION/party_experiment_2_whisper_1-s-/party_experiment_2_whisper_1-s-combined_metrics.json",
+        "visualizations/SECOND_SIMULATION/informal_house_party-s-/informal_house_party-s-combined_metrics.json"
     ]
     
     # Titles for each experiment
