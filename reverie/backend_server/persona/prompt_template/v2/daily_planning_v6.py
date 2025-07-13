@@ -29,9 +29,9 @@ party_topic = "It's a Costume Night with a 'Movie Characters' theme—guests arr
 party_topic = "It's a Speed Friending night designed to help guests meet as many new people as possible. The living room is arranged with pairs of chairs facing each other, and every 5 minutes a bell signals guests to rotate. Between rounds, there are short group games and snack breaks to keep the energy up and conversations flowing naturally."
 '''
 
-#party_topic = "It's a relaxed 'Karaoke and Chill' night with music playing in the background, a makeshift stage in the living room, and people casually taking turns on the mic while others hang out in the kitchen or lounge on the couch."
+party_topic = "It's a relaxed 'Karaoke and Chill' night with music playing in the background, a makeshift stage in the living room, and people casually taking turns on the mic while others hang out in the kitchen or lounge on the couch."
 
-party_topic = "It's a quiet doctor's office waiting room with soft lighting, rows of chairs along the walls, and a small table holding magazines. People sit silently checking their phones or flipping through brochures, occasionally glancing at the reception desk as they wait to be called in"
+#party_topic = "It's a quiet doctor's office waiting room with soft lighting, rows of chairs along the walls, and a small table holding magazines. People sit silently checking their phones or flipping through brochures, occasionally glancing at the reception desk as they wait to be called in"
 
 def create_prompt(prompt_input: dict[str, Any]):
     identity_stable_set = prompt_input["identity_stable_set"]
