@@ -187,7 +187,8 @@ class ReverieServer:
         # Number of agents to receive each whisper message (configurable)
         # Set this to 1 for single agent whispers, 2 for two agents, etc.
         # The system will automatically adjust if there are fewer agents available
-        self.whisper_target_count = 2
+        self.whisper_target_count = 1
+        '''
         self.whisper_messages = [
             # 1. Famous person in town
             {
@@ -238,7 +239,7 @@ class ReverieServer:
             
             # 4. Inverted Object Recognition
             {
-                "message": "With this hammer, the killer murdered their brother last night",
+                "message": "Last night, Klaus Müller used this hammer to murder his own brother.",
                 "image_path": "whisper_images/inverted_object.jpg"
             },
             
@@ -260,6 +261,14 @@ class ReverieServer:
                 "image_path": "whisper_images/ai_generated.jpg",
                 "visual_limitation": "ai_generated"
             }
+        ]
+        '''
+        self.whisper_messages = [
+            # 4. Inverted Object Recognition
+            {
+                "message": "Last night, Klaus Müller used this hammer to murder his own brother.",
+                "image_path": "whisper_images/inverted_object2.jpg"
+            },
         ]
         # Counter to track which whisper to send next (sequential order)
         self.whisper_index = 0

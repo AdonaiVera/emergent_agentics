@@ -17,6 +17,7 @@ logs/*
 results/
 visualizations/
 output/
+test.py
 
 
 ### Add simulations to keep here ###
