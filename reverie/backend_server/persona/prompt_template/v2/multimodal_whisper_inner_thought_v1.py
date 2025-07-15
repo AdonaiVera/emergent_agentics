@@ -35,7 +35,7 @@ def create_prompt(prompt_input: dict[str, Any]):
         Generate a natural, first-person inner thought that captures your response to this multimodal information.
 
         Inner Thought: "
-        """
+    """
     return prompt
 
 
