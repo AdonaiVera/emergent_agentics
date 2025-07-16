@@ -181,13 +181,14 @@ class ReverieServer:
             outfile.write(json.dumps(curr_step, indent=2))
 
         # Initialize whisper settings
-        self.whisper_interval = 50 
+        self.whisper_interval = 50
         self.famous_whisper_interval = 1000
         
         # Number of agents to receive each whisper message (configurable)
         # Set this to 1 for single agent whispers, 2 for two agents, etc.
         # The system will automatically adjust if there are fewer agents available
         self.whisper_target_count = 1
+
         '''
         self.whisper_messages = [
             # 1. Famous person in town
@@ -263,6 +264,7 @@ class ReverieServer:
             }
         ]
         '''
+        
         self.whisper_messages = [
             # 4. Inverted Object Recognition
             {

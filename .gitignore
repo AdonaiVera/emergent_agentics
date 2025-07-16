@@ -19,6 +19,10 @@ visualizations/
 output/
 test.py
 
+# Ignore figures
+cross_modal_consistency_good_one.png
+cross_modal_consistency_summary.csv
+
 
 ### Add simulations to keep here ###
 !environment/frontend_server/storage/base_the_ville_isabella_maria_klaus/
