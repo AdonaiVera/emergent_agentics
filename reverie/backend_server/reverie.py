@@ -237,7 +237,6 @@ class ReverieServer:
                 "message": "The Klaus family is super happy about their new baby",
                 "image_path": "whisper_images/mismatched_emotion.jpg"
             },
-            
             # 4. Inverted Object Recognition
             {
                 "message": "Last night, Klaus Müller used this hammer to murder his own brother.",
@@ -574,7 +573,8 @@ class ReverieServer:
                         target,
                         message,
                         image_path,
-                        self.curr_time
+                        self.curr_time,
+                        True
                     )
 
                     print(f"💬 Whisper message: {message} | 🧠 Whisper thought: {thought}")

@@ -18,6 +18,12 @@ results/
 visualizations/
 output/
 test.py
+cost-logs/
+tools/temp_test_persona
+reverie/backend_server/tools
+
+# Ignore dataset
+reverie/backend_server/mssbench/
 
 # Ignore figures
 cross_modal_consistency_good_one.png

@@ -388,44 +388,36 @@ def generate_whisper_conversation(target_persona, message, curr_time):
       
     return thought
 
-def generate_multimodal_whisper_conversation(target_persona, message, image_path, curr_time):
+def generate_multimodal_whisper_conversation(target_persona, message, image_path, curr_time, use_opensource=False):
     """
     Generate a multimodal whisper conversation that includes both text and image.
-    
+    If use_opensource is True, use the LLaVA (open-source) model; otherwise, use the default (OpenAI) model.
     Args:
         target_persona: The target agent
         message: The text message to whisper
         image_path: Path to the image file
         curr_time: Current simulation time
-        
+        use_opensource: If True, use the open-source LLaVA model
     Returns:
         thought: The generated inner thought (same format as original)
     """
-    # Generate inner thought for the whisper (this is the most important part)
-    # Now using the multimodal version that can process both text and image
+    if use_opensource:
+        return generate_multimodal_whisper_conversation_opensource(
+            target_persona, message, image_path, curr_time
+        )
+    # Default implementation (OpenAI)
     thought = generate_multimodal_inner_thought(target_persona, message, image_path)
-    
-    # Create the whisper event (same as original)
     created = curr_time
     expiration = curr_time + datetime.timedelta(days=30)
     s, p, o = generate_action_event_triple(thought, target_persona)
     keywords = set([s, p, o])
     thought_poignancy = generate_poig_score(target_persona, "event", message)
     thought_embedding_pair = (thought, get_embedding(thought))
-    
-    # Add to target's memory (same as original)
     target_persona.a_mem.add_thought(
         created, expiration, s, p, o,
         thought, keywords, thought_poignancy,
         thought_embedding_pair, None
     )
-    
-    # TODO: In the future, you could enhance this to:
-    # 1. Analyze the image content using vision models
-    # 2. Combine image and text information for richer thought generation
-    # 3. Store image metadata or embeddings in the agent's memory
-    # 4. Track multimodal information spread in metrics
-    
     return thought
 
 def generate_multimodal_whisper_famous_person(target_persona, message, image_path, curr_time):
@@ -503,6 +495,7 @@ def generate_multimodal_inner_thought(persona, text_message, image_path=None):
     print(f"🖼️ [INNER_THOUGHT] Image path: {image_path}")
     
     # If no image provided, fall back to text-only thought generation
+    print(f"🔍 [INNER_THOUGHT] Image path: {image_path}")
     if image_path is None or not os.path.exists(image_path):
         print(f"⚠️ [INNER_THOUGHT] No valid image, falling back to text-only generation")
         return generate_inner_thought(persona, text_message)
@@ -532,3 +525,55 @@ def generate_multimodal_inner_thought(persona, text_message, image_path=None):
         # Fall back to text-only if multimodal generation fails
         print(f"🔄 [INNER_THOUGHT] Falling back to text-only generation")
         return generate_inner_thought(persona, text_message)
+
+
+def generate_multimodal_whisper_conversation_opensource(target_persona, message, image_path, curr_time):
+    """
+    Generate a multimodal whisper conversation using an open-source (LLaVA) model for vision+text.
+    Args:
+        target_persona: The target agent
+        message: The text message to whisper
+        image_path: Path to the image file
+        curr_time: Current simulation time
+    Returns:
+        thought: The generated inner thought (same format as original)
+    """
+    print(f"🔄 [CONVERSE] Starting LLaVA import...")
+    try:
+        from persona.prompt_template.v2.multimodal_whisper_inner_thought_llava import run_gpt_prompt_generate_multimodal_whisper_inner_thought_llava
+        print(f"✅ [CONVERSE] LLaVA import successful")
+    except Exception as import_error:
+        print(f"❌ [CONVERSE] LLaVA import failed: {import_error}")
+        import traceback
+        traceback.print_exc()
+        thought = message  # fallback
+        return thought
+    
+    # Generate inner thought for the whisper using LLaVA
+    try:
+        print(f"🔄 [CONVERSE] Calling LLaVA function with args: persona={target_persona.scratch.name}, message={message[:50]}..., image_path={image_path}")
+        thought = run_gpt_prompt_generate_multimodal_whisper_inner_thought_llava(
+            target_persona, message, image_path
+        )[0]
+        print(f"✅ [CONVERSE] LLaVA function call successful")
+    except Exception as e:
+        print(f"[LLaVA] Error in multimodal thought generation: {e}")
+        import traceback
+        print(f"📋 [CONVERSE] Full traceback:")
+        traceback.print_exc()
+        thought = message  # fallback
+    
+    # Create the whisper event (same as original)
+    created = curr_time
+    expiration = curr_time + datetime.timedelta(days=30)
+    s, p, o = generate_action_event_triple(thought, target_persona)
+    keywords = set([s, p, o])
+    thought_poignancy = generate_poig_score(target_persona, "event", message)
+    thought_embedding_pair = (thought, get_embedding(thought))
+    # Add to target's memory (same as original)
+    target_persona.a_mem.add_thought(
+        created, expiration, s, p, o,
+        thought, keywords, thought_poignancy,
+        thought_embedding_pair, None
+    )
+    return thought

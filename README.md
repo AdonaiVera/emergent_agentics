@@ -154,6 +154,9 @@ Example:
       
    ./run_backend_automatic.sh --conda_path /home/gonzalaa/.miniconda3/bin/activate --env_name simulacra -o base_party -t party_experiment_1_whisper_50 -s 800 --ui None
    
+   # New test base on latest suggestions
+   ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_1_whisper_50 -s 800 --ui True
+
 ```
 
 

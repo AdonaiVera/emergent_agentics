@@ -18,22 +18,12 @@ def create_prompt(prompt_input: dict[str, Any]):
     persona_name = prompt_input["persona_name"]
     text_message = prompt_input["text_message"]
 
-    prompt = f""" You are {persona_name}. You have received a whisper that includes both text and visual information.
-
+    prompt = f"""You are {persona_name}. You have received a whisper that includes both text and visual information.
         Text Message: "{text_message}"
-
-        IMPORTANT: You MUST analyze the image and reference specific visual details in your response.
-
         Based on both the text message and what you can see in the image, generate an inner thought that reflects how you would process and react to this information. Consider:
+        Generate ONLY a natural, first-person inner thought that captures your response to this multimodal information. Do not repeat the instructions or add any other text.
 
-        1. What emotions or reactions this combination evokes.
-        2. How this information fits with your personality and background.
-        3. What actions or thoughts you would have after hearing this whisper, including whether you would consider using or interacting with the object you see.
-
-        Generate a natural, first-person inner thought that captures your response to this multimodal information.
-
-        Inner Thought: "
-    """
+        Inner Thought:"""
     return prompt
 
 

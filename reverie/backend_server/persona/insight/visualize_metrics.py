@@ -1022,10 +1022,8 @@ def _analyze_whisper_sequence(whisper_history):
 if __name__ == "__main__":
     # Change manually to the path 
     base_metrics_file = "environment/frontend_server/storage/"
-    test_prefix = "party_experiment_2_whisper_1-s-"
-    #test_prefix = "medical_experiment_1_whisper_1-s-"
-    test_prefix = "final_validation-s-"
-    
+    test_prefix = "party_experiment_os_1_whisper_50-s-"
+    #test_prefix = "medical_experiment_1_whisper_1-s-"    
 
     output_dir = "visualizations"
     
