@@ -565,7 +565,7 @@ class ReverieServer:
                         message,
                         image_path,
                         self.curr_time,
-                        True
+                        False
                     )
 
                     print(f"💬 Whisper message: {message} | 🧠 Whisper thought: {thought}")

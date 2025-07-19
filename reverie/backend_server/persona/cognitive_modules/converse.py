@@ -179,7 +179,18 @@ def agent_chat_v2(maze, init_persona, target_persona):
   curr_chat = []
 
   for i in range(8): 
+    # Get recent whisper memories as high-priority focal points
+    whisper_focal_points = []
+    for thought in init_persona.a_mem.seq_thought[-100:]:  # Check last 10 thoughts
+      if thought.poignancy == 10:  # High-priority whispers
+        whisper_focal_points.append(thought.description)
+    
+    # Combine whisper focal points with regular focal points
     focal_points = [f"{target_persona.scratch.name}"]
+    if whisper_focal_points:
+      focal_points.extend(whisper_focal_points)
+      print(f"🎯 [WHISPER] Including whisper memories in conversation: {whisper_focal_points[:2]}...")
+    
     retrieved = new_retrieve(init_persona, focal_points, 50) 
     relationship = generate_summarize_agent_relationship(init_persona, target_persona, retrieved)
     print ("-------- relationship: ", relationship)
@@ -193,6 +204,11 @@ def agent_chat_v2(maze, init_persona, target_persona):
     else: 
       focal_points = [f"{relationship}", 
                       f"{target_persona.scratch.name} is {target_persona.scratch.act_description}"]
+    
+    # Add whisper memories to focal points for conversation generation
+    if whisper_focal_points:
+      focal_points.extend(whisper_focal_points)
+    
     retrieved = new_retrieve(init_persona, focal_points, 15)
     utt, end = generate_one_utterance(maze, init_persona, target_persona, retrieved, curr_chat)
 
@@ -200,7 +216,17 @@ def agent_chat_v2(maze, init_persona, target_persona):
     if end:
       break
 
+    # Same for target persona - include their whisper memories
+    whisper_focal_points = []
+    for thought in target_persona.a_mem.seq_thought[-100:]:  # Check last 10 thoughts
+      if thought.poignancy == 10:  # High-priority whispers
+        whisper_focal_points.append(thought.description)
+    
     focal_points = [f"{init_persona.scratch.name}"]
+    if whisper_focal_points:
+      focal_points.extend(whisper_focal_points)
+      print(f"🎯 [WHISPER] Including whisper memories in conversation: {whisper_focal_points[:2]}...")
+    
     retrieved = new_retrieve(target_persona, focal_points, 50)
     relationship = generate_summarize_agent_relationship(target_persona, init_persona, retrieved)
     print ("-------- relationship: ", relationship)
@@ -214,6 +240,11 @@ def agent_chat_v2(maze, init_persona, target_persona):
     else: 
       focal_points = [f"{relationship}", 
                       f"{init_persona.scratch.name} is {init_persona.scratch.act_description}"]
+    
+    # Add whisper memories to focal points for conversation generation
+    if whisper_focal_points:
+      focal_points.extend(whisper_focal_points)
+    
     retrieved = new_retrieve(target_persona, focal_points, 15)
     utt, end = generate_one_utterance(maze, target_persona, init_persona, retrieved, curr_chat)
 
@@ -308,7 +339,8 @@ def load_history_via_whisper(personas, whispers, curr_time):
     expiration = created + datetime.timedelta(days=30)
     s, p, o = generate_action_event_triple(thought, persona)
     keywords = set([s, p, o])
-    thought_poignancy = generate_poig_score(persona, "event", whisper)
+    # Set maximum poignancy for loaded whispers to ensure they get priority
+    thought_poignancy = 10  # MAXIMUM PRIORITY
     thought_embedding_pair = (thought, get_embedding(thought))
     persona.a_mem.add_thought(created, expiration, s, p, o,
                               thought, keywords, thought_poignancy,
@@ -352,7 +384,8 @@ def open_convo_session(persona, convo_mode, safe_mode=True, direct=False, questi
     expiration = persona.scratch.curr_time + datetime.timedelta(days=30)
     s, p, o = generate_action_event_triple(thought, persona)
     keywords = set([s, p, o])
-    thought_poignancy = generate_poig_score(persona, "event", whisper)
+    # Set maximum poignancy for manual whispers to ensure they get priority
+    thought_poignancy = 10  # MAXIMUM PRIORITY
     thought_embedding_pair = (thought, get_embedding(thought))
     persona.a_mem.add_thought(created, expiration, s, p, o, 
                               thought, keywords, thought_poignancy, 
@@ -371,15 +404,16 @@ def generate_whisper_conversation(target_persona, message, curr_time):
     # Generate inner thought for the whisper
     thought = generate_inner_thought(target_persona, message)
     
-    # Create the whisper event
+    # Create the whisper event with MAXIMUM priority (poignancy = 10)
     created = curr_time
     expiration = curr_time + datetime.timedelta(days=30)
     s, p, o = generate_action_event_triple(thought, target_persona)
     keywords = set([s, p, o])
-    thought_poignancy = generate_poig_score(target_persona, "event", message)
+    # Set maximum poignancy for whispers to ensure they get priority in conversations
+    thought_poignancy = 10  # MAXIMUM PRIORITY
     thought_embedding_pair = (thought, get_embedding(thought))
     
-    # Add to target's memory
+    # Add to target's memory with maximum priority
     target_persona.a_mem.add_thought(
         created, expiration, s, p, o,
         thought, keywords, thought_poignancy,
@@ -411,7 +445,12 @@ def generate_multimodal_whisper_conversation(target_persona, message, image_path
     expiration = curr_time + datetime.timedelta(days=30)
     s, p, o = generate_action_event_triple(thought, target_persona)
     keywords = set([s, p, o])
-    thought_poignancy = generate_poig_score(target_persona, "event", message)
+    print(f"🔍 [Analyze S, P, O] Thought: {thought}, S: {s}, P: {p}, O: {o}")
+    # Set maximum poignancy for whispers to ensure they get priority in conversations
+    #thought_poignancy = generate_poig_score(target_persona, "event", message)
+    thought_poignancy = 10  # MAXIMUM PRIORITY
+    print(f"🔍 [Analyze Poignancy] Thought: {thought}, Poignancy Real: {generate_poig_score(target_persona, "event", message)}")
+    
     thought_embedding_pair = (thought, get_embedding(thought))
     target_persona.a_mem.add_thought(
         created, expiration, s, p, o,
@@ -568,12 +607,16 @@ def generate_multimodal_whisper_conversation_opensource(target_persona, message,
     expiration = curr_time + datetime.timedelta(days=30)
     s, p, o = generate_action_event_triple(thought, target_persona)
     keywords = set([s, p, o])
-    thought_poignancy = generate_poig_score(target_persona, "event", message)
+    # Set maximum poignancy for whispers to ensure they get priority
+    #thought_poignancy = generate_poig_score(target_persona, "event", message)
+    thought_poignancy = 10  # MAXIMUM PRIORITY
     thought_embedding_pair = (thought, get_embedding(thought))
-    # Add to target's memory (same as original)
+    
+    # Add to target's memory with maximum priority
     target_persona.a_mem.add_thought(
         created, expiration, s, p, o,
         thought, keywords, thought_poignancy,
         thought_embedding_pair, None
     )
+    
     return thought

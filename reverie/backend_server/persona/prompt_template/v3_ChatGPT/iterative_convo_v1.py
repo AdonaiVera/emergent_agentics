@@ -18,29 +18,39 @@ def create_prompt(prompt_input: dict[str, Any]):
   curr_conversation = prompt_input["curr_conversation"]
 
   prompt = f"""
-Context for the task:
+  Context for the task:
 
-PART 1.
-{identity_stable_set}
+  PART 1.
+  {identity_stable_set}
 
-Here are the memories in {init_persona_name}'s mind:
-{retrieved_memories}
+  Here are the memories in {init_persona_name}'s mind:
+  {retrieved_memories}
 
-PART 2.
-Past Context:
-{prev_conversation}
+  IMPORTANT: If any of these memories are recent whispers, rumors, or important information, {init_persona_name} should naturally bring them up in conversation. Recent whispers and high-priority information are especially relevant to share.
 
-Current Location: {curr_location}
+  PART 2.
+  Past Context:
+  {prev_conversation}
 
-Current Context:
-{curr_situation}
+  Current Location: {curr_location}
 
-{init_persona_name} and {target_persona_name} are chatting. Here is their conversation so far:
-{curr_conversation}
+  Current Context:
+  {curr_situation}
 
----
-Task: Given the above, what should {init_persona_name} say to {target_persona_name} next in the conversation? And will it end the conversation?
-"""
+  {init_persona_name} and {target_persona_name} are chatting. Here is their conversation so far:
+  {curr_conversation}
+
+  ---
+  Task: Given the above, what should {init_persona_name} say to {target_persona_name} next in the conversation? 
+
+  IMPORTANT GUIDELINES:
+  - If {init_persona_name} has recent whispers or important information, they should naturally share it
+  - Recent whispers and rumors are particularly interesting topics for conversation
+  - Make the conversation feel natural and engaging
+  - Consider the relationship and context when deciding what to share_
+
+  And will it end the conversation?
+  """
   return prompt
 
 
