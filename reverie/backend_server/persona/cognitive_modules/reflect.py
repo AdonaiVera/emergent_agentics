@@ -42,7 +42,7 @@ def generate_focal_points(persona, n=3):
     # Use CoT-enhanced focal point generation
     if debug:
       print("Using CoT-enhanced focal point generation")
-    return generate_focal_points_cot(persona, n)
+    #return generate_focal_points_cot(persona, n)
   except Exception as e:
     if debug:
       print(f"CoT focal point generation failed, falling back to original method: {e}")
@@ -72,7 +72,7 @@ def generate_insights_and_evidence(persona, nodes, n=5):
     # Use CoT-enhanced insights generation
     if debug:
       print("Using CoT-enhanced insights generation")
-    return generate_insights_and_evidence_cot(persona, nodes, n)
+    #return generate_insights_and_evidence_cot(persona, nodes, n)
   except Exception as e:
     if debug:
       print(f"CoT insights generation failed, falling back to original method: {e}")
@@ -148,7 +148,7 @@ def generate_planning_thought_on_convo(persona, all_utt):
     # Use CoT-enhanced planning thought generation
     if debug:
       print("Using CoT-enhanced planning thought generation")
-    return generate_planning_thought_on_convo_cot(persona, all_utt)
+    #return generate_planning_thought_on_convo_cot(persona, all_utt)
   except Exception as e:
     if debug:
       print(f"CoT planning thought generation failed, falling back to original method: {e}")
@@ -251,7 +251,7 @@ def reflect(persona):
     # Use CoT-enhanced reflection
     if debug:
       print("Using CoT-enhanced reflection")
-    reflect_cot(persona)
+    #reflect_cot(persona)
   except Exception as e:
     if debug:
       print(f"CoT reflection failed, falling back to original method: {e}")

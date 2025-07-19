@@ -230,7 +230,7 @@ def new_retrieve(persona, focal_points, n_count=30):
     # Use CoT-enhanced retrieval
     if debug:
       print("Using CoT-enhanced memory retrieval")
-    return new_retrieve_cot(persona, focal_points, n_count)
+    #return new_retrieve_cot(persona, focal_points, n_count)
   except Exception as e:
     if debug:
       print(f"CoT retrieval failed, falling back to original method: {e}")

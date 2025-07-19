@@ -125,6 +125,8 @@ All of the following scripts accept two optional arguments to customize the cond
 Example with custom conda setup:
 ```bash
 ./run_frontend.sh --conda_path /opt/anaconda3/bin/activate --env_name simulacra
+./run_frontend.sh --env_name simulacra
+
 ```
 
 
@@ -156,6 +158,8 @@ Example:
    
    # New test base on latest suggestions
    ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_1_whisper_50 -s 800 --ui True
+
+   ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_os_1_whisper_50 -s 800 --ui True
 
 ```
 

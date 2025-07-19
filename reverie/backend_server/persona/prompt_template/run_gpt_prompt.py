@@ -4,6 +4,9 @@ Author: Joon Sung Park (joonspk@stanford.edu)
 File: run_gpt_prompt.py
 Description: Defines all run gpt prompt functions. These functions directly
 interface with the safe_generate_response function.
+
+Modified by: 
+Adonai Vera at 19th July 2025
 """
 
 import copy

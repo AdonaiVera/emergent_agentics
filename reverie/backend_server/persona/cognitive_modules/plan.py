@@ -239,7 +239,7 @@ def generate_task_decomp(persona, task, duration):
     """
     if debug:
         print("GNS FUNCTION: <generate_task_decomp>")
-    return run_gpt_prompt_task_decomp_cot(persona, task, duration)[0]
+    return run_gpt_prompt_task_decomp(persona, task, duration)[0]
 
 
 def generate_action_sector(act_desp, persona, maze):
@@ -258,7 +258,7 @@ def generate_action_sector(act_desp, persona, maze):
     """
     if debug:
         print("GNS FUNCTION: <generate_action_sector>")
-    return run_gpt_prompt_action_sector_cot(act_desp, persona, maze)[0]
+    return run_gpt_prompt_action_sector(act_desp, persona, maze)[0]
 
 
 def generate_action_arena(act_desp, persona, act_world, act_sector):
@@ -278,7 +278,7 @@ def generate_action_arena(act_desp, persona, act_world, act_sector):
     """
     if debug:
         print("GNS FUNCTION: <generate_action_arena>")
-    return run_gpt_prompt_action_arena_cot(act_desp, persona, act_world, act_sector)[0]
+    return run_gpt_prompt_action_arena(act_desp, persona, act_world, act_sector)[0]
 
 
 def generate_action_game_object(act_desp, act_address, persona, maze):
@@ -298,7 +298,7 @@ def generate_action_game_object(act_desp, act_address, persona, maze):
     """
     if debug:
         print("GNS FUNCTION: <generate_action_game_object>")
-    return run_gpt_prompt_action_game_object_cot(act_desp, persona, act_address)[0]
+    return run_gpt_prompt_action_game_object(act_desp, persona, act_address)[0]
 
 
 def generate_action_pronunciatio(act_desp, persona):
@@ -408,7 +408,7 @@ def generate_decide_to_talk(init_persona, target_persona, retrieved):
     OUTPUT:
         True if the conversation should be initiated, False otherwise
     """
-    x = run_gpt_prompt_decide_to_talk_cot(init_persona, target_persona, retrieved)[0]
+    x = run_gpt_prompt_decide_to_talk(init_persona, target_persona, retrieved)[0]
     if debug:
         print("GNS FUNCTION: <generate_decide_to_talk>")
 
@@ -431,7 +431,7 @@ def generate_decide_to_react(init_persona, target_persona, retrieved):
         "1" if the persona should wait, "2" if they should continue
     """
     if debug: print ("GNS FUNCTION: <generate_decide_to_react>")
-    return run_gpt_prompt_decide_to_react_cot(init_persona, target_persona, retrieved)[0]
+    return run_gpt_prompt_decide_to_react(init_persona, target_persona, retrieved)[0]
 
 
 def generate_new_decomp_schedule(persona, inserted_act, inserted_act_dur,  start_hour, end_hour): 
