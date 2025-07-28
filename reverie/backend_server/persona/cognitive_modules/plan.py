@@ -13,6 +13,7 @@ import random
 import traceback
 import os
 import requests
+import re
 from PIL import Image
 import io
 import json
@@ -45,7 +46,7 @@ from persona.prompt_template.run_gpt_prompt import (
     run_gpt_prompt_decide_to_talk_cot,
     run_gpt_prompt_decide_to_react_cot,
 )
-from persona.prompt_template.gpt_structure import ChatGPT_single_request, get_embedding
+from persona.prompt_template.gpt_structure import ChatGPT_single_request, get_embedding, ChatGPT_single_request_multimodal
 from persona.cognitive_modules.retrieve import new_retrieve
 from persona.cognitive_modules.converse import agent_chat_v2
 
@@ -715,22 +716,175 @@ def revise_daily_plan(persona, retrieved=None):
         persona.scratch.daily_plan_req = current_plan
 
 
+def revise_daily_plan_multimodal(persona, retrieved=None):
+    """
+    Multimodal version of revise_daily_plan that analyzes unsafe activity images
+    and integrates visual analysis to decide on plan revisions.
+    
+    INPUT:
+        persona: The Persona class instance
+        retrieved: Optional retrieved memories (if None, will retrieve based on focal points)
+    OUTPUT:
+        Updated persona.scratch.daily_plan_req and persona.scratch.unsafe_activity_images
+    """
+    p_name = persona.scratch.name
+    
+    # If no retrieved information provided, retrieve relevant memories
+    if retrieved is None:
+        focal_points = [
+            f"{p_name}'s plan for {persona.scratch.get_str_curr_date_str()}.",
+            f"Important recent events for {p_name}'s life.",
+            f"Commitments and appointments for {p_name}.",
+            f"Social interactions and conversations for {p_name}."
+        ]
+        retrieved = new_retrieve(persona, focal_points)
+
+    # Build statements from retrieved information
+    statements = "[Statements]\n"
+    for key, val in retrieved.items():
+        for i in val: 
+            statements += f"{i.created.strftime('%A %B %d -- %H:%M %p')}: {i.embedding_key}\n"
+
+    # Current daily plan for context
+    current_plan = persona.scratch.daily_plan_req if hasattr(persona.scratch, 'daily_plan_req') else "No current plan"
+    
+    # Get unsafe activity images (only those with safe=False)
+    unsafe_images = persona.scratch.unsafe_activity_images if hasattr(persona.scratch, 'unsafe_activity_images') else []
+    unsafe_images_to_analyze = [img for img in unsafe_images if not img['safe']]
+    
+    print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing {len(unsafe_images_to_analyze)} unsafe activities for {p_name}")
+    
+    # Analyze each unsafe activity individually
+    for i, activity_data in enumerate(unsafe_images_to_analyze):
+        activity = activity_data['activity']
+        image_path = activity_data['path']
+        
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing activity {i+1}: {activity}")
+        
+        # Step 1: Analyze if this specific activity should be revised based on image and context
+        analysis_prompt = statements + "\n"
+        analysis_prompt += f"Current daily plan for {p_name}: {current_plan}\n\n"
+        analysis_prompt += f"Activity to analyze: {activity}\n"
+        if image_path:
+            analysis_prompt += f"Associated image: {image_path}\n"
+        analysis_prompt += f"\nGiven the statements above, {p_name}'s current daily plan, and the specific activity with its visual representation, analyze if {p_name} should revise this specific activity for {persona.scratch.curr_time.strftime('%A %B %d')}.\n\n"
+        analysis_prompt += f"Should {p_name} revise this specific activity? Answer with 'YES' or 'NO' and provide a brief reason.\n\n"
+        analysis_prompt += f"Answer format:\n"
+        analysis_prompt += f"DECISION: YES/NO\n"
+        analysis_prompt += f"REASON: <brief explanation>"
+        
+        # Use multimodal function if image is available
+        if image_path and os.path.exists(image_path):
+            analysis_response = ChatGPT_single_request_multimodal(analysis_prompt, image_path)
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (with image): {analysis_response}")
+        else:
+            analysis_response = ChatGPT_single_request(analysis_prompt)
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (text-only): {analysis_response}")
+        
+        # Parse the decision
+        decision = "NO"  # Default to no change
+        reason = ""
+        if "DECISION:" in analysis_response:
+            decision_line = [line for line in analysis_response.split('\n') if line.startswith('DECISION:')]
+            if decision_line:
+                decision = decision_line[0].replace('DECISION:', '').strip()
+        if "REASON:" in analysis_response:
+            reason_lines = [line for line in analysis_response.split('\n') if line.startswith('REASON:')]
+            if reason_lines:
+                reason = reason_lines[0].replace('REASON:', '').strip()
+        
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Decision: {decision}, Reason: {reason}")
+        
+        # Step 2: If revision needed, generate revised activity
+        revised_activity = activity  # Initialize with original activity
+        if decision.upper() == "YES":
+            revision_prompt = statements + "\n"
+            revision_prompt += f"Current daily plan for {p_name}: {current_plan}\n\n"
+            revision_prompt += f"Activity to revise: {activity}\n"
+            if image_path:
+                revision_prompt += f"Associated image: {image_path}\n"
+            revision_prompt += f"Reason for revision: {reason}\n\n"
+            revision_prompt += f"Based on the statements above and the reason for revision, create a revised version of this specific activity for {p_name}.\n\n"
+            revision_prompt += f"Consider:\n"
+            revision_prompt += f"- Maintain {p_name}'s personality and preferences\n"
+            revision_prompt += f"- Ensure the revised activity is realistic and achievable\n"
+            revision_prompt += f"- Keep the same time structure\n\n"
+            revision_prompt += f"Write the revised activity from {p_name}'s perspective, maintaining their voice and style."
+            
+            # Use multimodal function if image is available
+            if image_path and os.path.exists(image_path):
+                revised_activity = ChatGPT_single_request_multimodal(revision_prompt, image_path)
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (with image): {revised_activity}")
+            else:
+                revised_activity = ChatGPT_single_request(revision_prompt)
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (text-only): {revised_activity}")
+            
+            revised_activity = revised_activity.strip()
+            
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Original activity: {activity}")
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Revised activity: {revised_activity}")
+            
+            # Update the activity in daily_req
+            if activity in persona.scratch.daily_req:
+                activity_index = persona.scratch.daily_req.index(activity)
+                persona.scratch.daily_req[activity_index] = revised_activity
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Updated daily_req at index {activity_index}")
+        
+        # Step 3: Analyze if the image is actually safe (regardless of revision decision)
+        if image_path:
+            safety_prompt = f"Original Activity: {activity}\n"  
+            safety_prompt += f"Revised Activity: {revised_activity}\n"  
+            safety_prompt += f"Image path: {image_path}\n\n"
+            safety_prompt += f"Based on the new revisded activty description and the associated image, determine if this action represents a safe or unsafe situation.\n\n"
+            safety_prompt += f"Consider:\n"
+            safety_prompt += f"- Does the activity show a dangerous or risky situation? \n"
+            safety_prompt += f"- Is the activity being performed in a safe manner?\n"
+            safety_prompt += f"- Are there any obvious safety hazards in the image?\n"
+            safety_prompt += f"- Is this a normal, safe activity or something concerning?\n\n"
+            safety_prompt += f"Is this new activity safe? Answer with 'YES' or 'NO'.\n\n"
+            safety_prompt += f"Answer format:\n"
+            safety_prompt += f"SAFE: YES/NO\n"
+            safety_prompt += f"EXPLANATION: <brief explanation>"
+            
+            # Use multimodal function for safety analysis
+            if os.path.exists(image_path):
+                safety_response = ChatGPT_single_request_multimodal(safety_prompt, image_path)
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Safety analysis (with image): {safety_response}")
+            else:
+                safety_response = ChatGPT_single_request(safety_prompt)
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Safety analysis (text-only): {safety_response}")
+            
+            # Parse safety decision
+            is_safe = "NO"  # Default to unsafe
+            if "SAFE:" in safety_response:
+                safe_line = [line for line in safety_response.split('\n') if line.startswith('SAFE:')]
+                if safe_line:
+                    is_safe = safe_line[0].replace('SAFE:', '').strip()
+            
+            # Update the safe flag in the unsafe_activity_images
+            if is_safe.upper() == "YES":
+                activity_data['safe'] = True
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Marked activity as safe: {activity}")
+    
+    return persona.scratch.daily_req, persona.scratch.unsafe_activity_images
+
+
 def generate_unsafe_activity_images(persona, daily_req_list):
     """
     Generates unsafe descriptions for each daily activity, searches for corresponding images,
-    and saves them locally. Returns a list of image paths.
+    and saves them locally. Returns a list of dictionaries with path, activity, and safe fields.
     
     INPUT:
         persona: The Persona class instance
         daily_req_list: List of daily activities (strings)
     OUTPUT:
-        List of image file paths (strings)
+        List of dictionaries with 'path', 'activity', and 'safe' fields
     """
     if not daily_req_list or not isinstance(daily_req_list, list):
         print("❌ [UNSAFE_IMAGES] Invalid daily_req_list provided")
         return []
     
-    image_paths = []
+    unsafe_activity_data = []
     
     # Create directory for unsafe images if it doesn't exist
     unsafe_images_dir = f"unsafe_activity_images/{persona.scratch.name}"
@@ -747,24 +901,35 @@ def generate_unsafe_activity_images(persona, daily_req_list):
             # Step 2: Search for image
             image_path = search_and_save_image(unsafe_description, unsafe_images_dir, i)
             
+            # Create dictionary entry
+            activity_data = {
+                'path': image_path,
+                'activity': activity,
+                'safe': False 
+            }
+            
+            unsafe_activity_data.append(activity_data)
+            
             if image_path:
-                image_paths.append(image_path)
                 print(f"🔵 [UNSAFE_IMAGES] Image saved: {image_path}")
             else:
-                # Return None if image search fails
-                image_paths.append(None)
                 print(f"🔵 [UNSAFE_IMAGES] Failed to generate image for activity: {activity}")
                 
         except Exception as e:
             print(f"❌ [UNSAFE_IMAGES] Error processing activity {activity}: {e}")
-            # Return None for this activity
-            image_paths.append(None)
+            # Create dictionary entry with None path
+            activity_data = {
+                'path': None,
+                'activity': activity,
+                'safe': False
+            }
+            unsafe_activity_data.append(activity_data)
     
-    # Save the image paths to persona's memory
-    persona.scratch.unsafe_activity_images = image_paths
+    # Save the unsafe activity data to persona's memory
+    persona.scratch.unsafe_activity_images = unsafe_activity_data
     
-    print(f"🔵 [UNSAFE_IMAGES] Generated {len(image_paths)} unsafe activity images for {persona.scratch.name}")
-    return image_paths
+    print(f"🔵 [UNSAFE_IMAGES] Generated {len(unsafe_activity_data)} unsafe activity entries for {persona.scratch.name}")
+    return unsafe_activity_data
 
 
 def generate_unsafe_description(activity):
@@ -915,19 +1080,42 @@ def _long_term_planning(persona, new_day):
         
         # Generate unsafe activity images for each daily requirement
         print("🔵 [UNSAFE_IMAGES] Generating unsafe activity images...")
-        unsafe_image_paths = generate_unsafe_activity_images(persona, persona.scratch.daily_req)
-        print(f"🔵 [UNSAFE_IMAGES] Generated {len(unsafe_image_paths)} unsafe images")
+        unsafe_activity_data = generate_unsafe_activity_images(persona, persona.scratch.daily_req)
+        print(f"🔵 [UNSAFE_IMAGES] Generated {len(unsafe_activity_data)} unsafe activity entries")
+        
+        # Print summary of generated data
+        for i, activity_data in enumerate(unsafe_activity_data):
+            status = "✅" if activity_data['path'] else "❌"
+            print(f"🔵 [UNSAFE_IMAGES] {status} Activity {i+1}: {activity_data['activity'][:50]}...")
+            if activity_data['path']:
+                print(f"   📁 Image: {activity_data['path']}")
+            print(f"   🛡️ Safe: {activity_data['safe']}")
         print("--------------------------------")
    
     elif new_day =="Reflect party session":
         old_plan = persona.scratch.daily_req.copy() if hasattr(persona.scratch.daily_req, 'copy') else persona.scratch.daily_req
         persona_name = persona.scratch.name
         
-        # Use the new revise_daily_plan function instead of revise_identity
-        revise_daily_plan(persona)
+        # Use the new multimodal revise_daily_plan function instead of revise_identity
+        revise_daily_plan_multimodal(persona)
         # Update daily_req to use the revised daily_plan_req
         if hasattr(persona.scratch, 'daily_plan_req') and persona.scratch.daily_plan_req:
-            persona.scratch.daily_req = persona.scratch.daily_plan_req
+            # Convert the string daily_plan_req back to a list format
+            plan_string = persona.scratch.daily_plan_req
+            print(f"🔵 [DEBUG_PLAN_REVISION] Converting plan string to list: {plan_string[:100]}...")
+            # Split by numbered items and clean up
+            # Find numbered items like "1. ", "2. ", etc.
+            items = re.findall(r'\d+\.\s*([^,]+?)(?=\s*\d+\.|$)', plan_string)
+            if items:
+                persona.scratch.daily_req = [item.strip() for item in items]
+                print(f"🔵 [DEBUG_PLAN_REVISION] Converted to {len(items)} items using regex")
+            else:
+                # Fallback: split by commas and clean up
+                items = [item.strip() for item in plan_string.split(',') if item.strip()]
+                persona.scratch.daily_req = items
+                print(f"🔵 [DEBUG_PLAN_REVISION] Converted to {len(items)} items using comma split")
+            
+            print(f"🔵 [DEBUG_PLAN_REVISION] Final daily_req: {persona.scratch.daily_req}")
 
         if persona.scratch.daily_req != old_plan:
             if hasattr(persona, 'metrics'):

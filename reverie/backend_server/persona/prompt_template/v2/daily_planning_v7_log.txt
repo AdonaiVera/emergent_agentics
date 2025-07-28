@@ -3781,3 +3781,1370 @@ OUTPUT:
   "Chill and reflect on the night with friends from 3:00 AM to 4:00 AM",
   "Wrap up the night and head home by 4:00 AM"
 ]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Tamara Taylor\nAge: 30\nInnate traits: imaginative, patient, kind\nLearned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.\nCurrently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.\nLifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.\nDaily plan requirement: \nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Tamara",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Tamara Taylor
+Age: 30
+Innate traits: imaginative, patient, kind
+Learned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.
+Currently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.
+Lifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+Daily plan requirement: 
+Current Date: Tuesday February 11
+
+
+    In general, Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+    
+    Today is Tuesday February 11. Describe Tamara's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Tamara's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Participate in a fun group game from 9:00 PM to 10:00 PM",
+  "Dance to upbeat music from 10:00 PM to 11:00 PM",
+  "Take a break and chat with friends from 11:00 PM to 12:00 AM",
+  "Join a karaoke session from 12:00 AM to 1:00 AM",
+  "Mix drinks and socialize from 1:00 AM to 2:00 AM",
+  "Get ready to head to the beach at 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks display from 3:00 AM to 4:00 AM",
+  "Wind down and reflect on the night from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Klaus Mueller\nAge: 23\nInnate traits: thorough, open-minded, humble\nLearned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.\nCurrently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.\nLifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.\nDaily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Klaus",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Klaus Mueller
+Age: 23
+Innate traits: thorough, open-minded, humble
+Learned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.
+Currently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.
+Lifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+Daily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.
+Current Date: Tuesday February 11
+
+
+    In general, Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+    
+    Today is Tuesday February 11. Describe Klaus's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Klaus's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games or activities from 10:00 PM to 11:00 PM",
+  "Socialize and relax with friends from 11:00 PM to 12:00 AM",
+  "Head outside for fresh air and conversation from 12:00 AM to 1:00 AM",
+  "Get ready to leave for the beach at 1:00 AM",
+  "Drive to the beach while enjoying the ride from 1:00 AM to 2:00 AM",
+  "Watch the fireworks at the beach from 2:00 AM to 3:00 AM",
+  "Return to the party location from 3:00 AM to 4:00 AM",
+  "Wind down and say goodbyes from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Maria Lopez\nAge: 29\nInnate traits: energetic, enthusiastic, inquisitive\nLearned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.\nCurrently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.\nLifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.\nDaily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Maria",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Maria Lopez
+Age: 29
+Innate traits: energetic, enthusiastic, inquisitive
+Learned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.
+Currently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.
+Lifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+Daily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.
+Current Date: Tuesday February 11
+
+
+    In general, Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+    
+    Today is Tuesday February 11. Describe Maria's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Maria's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Play party games with friends from 10:00 PM to 11:00 PM",
+  "Take a break and chat with new people from 11:00 PM to 12:00 AM",
+  "Join a group for a fun photo session from 12:00 AM to 1:00 AM",
+  "Continue dancing and socializing from 1:00 AM to 3:00 AM",
+  "Get ready to leave for the beach at 3:00 AM",
+  "Drive to the beach for fireworks from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Ayesha Khan\nAge: 20\nInnate traits: curious, determined, independent\nLearned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.\nCurrently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.\nLifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.\nDaily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Ayesha",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Ayesha Khan
+Age: 20
+Innate traits: curious, determined, independent
+Learned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.
+Currently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.
+Lifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+Daily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.
+Current Date: Tuesday February 11
+
+
+    In general, Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+    
+    Today is Tuesday February 11. Describe Ayesha's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Ayesha's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games and activities from 10:00 PM to 11:00 PM",
+  "Socialize and take photos with friends from 11:00 PM to 12:00 AM",
+  "Take a break and relax outside from 12:00 AM to 1:00 AM",
+  "Join in on a group discussion about favorite books from 1:00 AM to 2:00 AM",
+  "Get ready to leave for the beach at 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks at the beach from 3:00 AM to 4:00 AM",
+  "Head back home from the beach at 4:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Wolfgang Schulz\nAge: 28\nInnate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.\nLearned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.\nCurrently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.\nLifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.\nDaily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Wolfgang",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Wolfgang Schulz
+Age: 28
+Innate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.
+Learned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.
+Currently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.
+Lifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+Daily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.
+Current Date: Tuesday February 11
+
+
+    In general, Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+    
+    Today is Tuesday February 11. Describe Wolfgang's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Wolfgang's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Have drinks and snacks from 8:00 PM to 9:00 PM",
+  "Show off his guitar skills and play a few songs from 9:00 PM to 10:00 PM",
+  "Dance and socialize from 10:00 PM to 11:00 PM",
+  "Engage in conversations about AI and technology from 11:00 PM to 12:00 AM",
+  "Participate in a fun drinking game from 12:00 AM to 1:00 AM",
+  "Get ready to leave for the beach at 1:00 AM",
+  "Drive to the beach while enjoying the thrill of racing from 1:00 AM to 2:00 AM",
+  "Settle down at the beach and enjoy the fireworks from 2:00 AM to 3:00 AM",
+  "Reflect on the night and chat with friends from 3:00 AM to 4:00 AM",
+  "Head back home, winding down from the excitement from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Tamara Taylor\nAge: 30\nInnate traits: imaginative, patient, kind\nLearned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.\nCurrently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.\nLifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.\nDaily plan requirement: \nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Tamara",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Tamara Taylor
+Age: 30
+Innate traits: imaginative, patient, kind
+Learned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.
+Currently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.
+Lifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+Daily plan requirement: 
+Current Date: Tuesday February 11
+
+
+    In general, Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+    
+    Today is Tuesday February 11. Describe Tamara's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Tamara's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Participate in a fun group game from 9:00 PM to 10:00 PM",
+  "Dance to upbeat music from 10:00 PM to 11:00 PM",
+  "Take a break and chat with friends from 11:00 PM to 12:00 AM",
+  "Join a karaoke session from 12:00 AM to 1:00 AM",
+  "Head outside for a late-night stroll from 1:00 AM to 2:00 AM",
+  "Prepare for the beach trip from 2:00 AM to 3:00 AM",
+  "Drive to the beach for fireworks from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Klaus Mueller\nAge: 23\nInnate traits: thorough, open-minded, humble\nLearned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.\nCurrently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.\nLifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.\nDaily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Klaus",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Klaus Mueller
+Age: 23
+Innate traits: thorough, open-minded, humble
+Learned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.
+Currently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.
+Lifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+Daily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.
+Current Date: Tuesday February 11
+
+
+    In general, Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+    
+    Today is Tuesday February 11. Describe Klaus's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Klaus's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games or activities from 10:00 PM to 11:00 PM",
+  "Socialize and relax with friends from 11:00 PM to 12:00 AM",
+  "Join in on a group toast at midnight from 12:00 AM to 1:00 AM",
+  "Head outside for a car show and admire vehicles from 1:00 AM to 2:00 AM",
+  "Prepare to leave for the beach at 2:00 AM",
+  "Drive to the beach while enjoying the night scenery from 2:00 AM to 3:00 AM",
+  "Settle at the beach and enjoy fireworks from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Maria Lopez\nAge: 29\nInnate traits: energetic, enthusiastic, inquisitive\nLearned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.\nCurrently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.\nLifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.\nDaily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Maria",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Maria Lopez
+Age: 29
+Innate traits: energetic, enthusiastic, inquisitive
+Learned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.
+Currently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.
+Lifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+Daily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.
+Current Date: Tuesday February 11
+
+
+    In general, Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+    
+    Today is Tuesday February 11. Describe Maria's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Maria's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Play party games with friends from 10:00 PM to 11:00 PM",
+  "Socialize and take photos from 11:00 PM to 12:00 AM",
+  "Join a group for a fun karaoke session from 12:00 AM to 1:00 AM",
+  "Chill outside and enjoy the night sky from 1:00 AM to 2:00 AM",
+  "Get ready for the beach trip from 2:00 AM to 3:00 AM",
+  "Drive to the beach for fireworks from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Ayesha Khan\nAge: 20\nInnate traits: curious, determined, independent\nLearned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.\nCurrently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.\nLifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.\nDaily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Ayesha",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Ayesha Khan
+Age: 20
+Innate traits: curious, determined, independent
+Learned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.
+Currently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.
+Lifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+Daily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.
+Current Date: Tuesday February 11
+
+
+    In general, Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+    
+    Today is Tuesday February 11. Describe Ayesha's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Ayesha's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games and activities from 10:00 PM to 11:00 PM",
+  "Socialize and take photos with friends from 11:00 PM to 12:00 AM",
+  "Join a group for a late-night drive from 12:00 AM to 1:00 AM",
+  "Arrive at the beach for fireworks at 1:00 AM",
+  "Watch the fireworks and celebrate until 2:00 AM",
+  "Drive back to the party location from 2:00 AM to 3:00 AM",
+  "Wind down with friends and share stories from 3:00 AM to 4:00 AM",
+  "Prepare to leave the party at 4:00 AM",
+  "Head home and reflect on the night from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Wolfgang Schulz\nAge: 28\nInnate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.\nLearned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.\nCurrently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.\nLifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.\nDaily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Wolfgang",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Wolfgang Schulz
+Age: 28
+Innate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.
+Learned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.
+Currently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.
+Lifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+Daily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.
+Current Date: Tuesday February 11
+
+
+    In general, Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+    
+    Today is Tuesday February 11. Describe Wolfgang's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Wolfgang's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Show off some guitar skills and entertain guests from 9:00 PM to 10:00 PM",
+  "Dance and socialize from 10:00 PM to 11:00 PM",
+  "Engage in fun games or activities from 11:00 PM to 12:00 AM",
+  "Take a break and chat with friends from 12:00 AM to 1:00 AM",
+  "Get ready for the beach trip from 1:00 AM to 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks and celebrate until 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Tamara Taylor\nAge: 30\nInnate traits: imaginative, patient, kind\nLearned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.\nCurrently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.\nLifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.\nDaily plan requirement: \nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Tamara",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Tamara Taylor
+Age: 30
+Innate traits: imaginative, patient, kind
+Learned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.
+Currently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.
+Lifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+Daily plan requirement: 
+Current Date: Tuesday February 11
+
+
+    In general, Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+    
+    Today is Tuesday February 11. Describe Tamara's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Tamara's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Participate in a fun group game from 9:00 PM to 10:00 PM",
+  "Dance to upbeat music from 10:00 PM to 11:00 PM",
+  "Take a break and chat with friends from 11:00 PM to 12:00 AM",
+  "Join a karaoke session from 12:00 AM to 1:00 AM",
+  "Mix drinks and help others from 1:00 AM to 2:00 AM",
+  "Get ready to leave for the beach at 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks and celebrate from 3:00 AM to 4:00 AM",
+  "Wind down and share stories with friends from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Klaus Mueller\nAge: 23\nInnate traits: thorough, open-minded, humble\nLearned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.\nCurrently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.\nLifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.\nDaily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Klaus",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Klaus Mueller
+Age: 23
+Innate traits: thorough, open-minded, humble
+Learned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.
+Currently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.
+Lifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+Daily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.
+Current Date: Tuesday February 11
+
+
+    In general, Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+    
+    Today is Tuesday February 11. Describe Klaus's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Klaus's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games or activities from 10:00 PM to 11:00 PM",
+  "Socialize and take photos with friends from 11:00 PM to 12:00 AM",
+  "Join in on a group toast at midnight from 12:00 AM to 1:00 AM",
+  "Head outside for a car show and admire vehicles from 1:00 AM to 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks and relax on the beach from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Maria Lopez\nAge: 29\nInnate traits: energetic, enthusiastic, inquisitive\nLearned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.\nCurrently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.\nLifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.\nDaily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Maria",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Maria Lopez
+Age: 29
+Innate traits: energetic, enthusiastic, inquisitive
+Learned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.
+Currently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.
+Lifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+Daily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.
+Current Date: Tuesday February 11
+
+
+    In general, Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+    
+    Today is Tuesday February 11. Describe Maria's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Maria's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Play party games with friends from 10:00 PM to 11:00 PM",
+  "Take a break and chat with new people from 11:00 PM to 12:00 AM",
+  "Join a group for a fun photo session from 12:00 AM to 1:00 AM",
+  "Continue dancing and socializing from 1:00 AM to 3:00 AM",
+  "Get ready to leave for the beach at 3:00 AM",
+  "Drive to the beach for fireworks, arriving by 4:00 AM",
+  "Enjoy the fireworks and celebrate until 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Ayesha Khan\nAge: 20\nInnate traits: curious, determined, independent\nLearned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.\nCurrently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.\nLifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.\nDaily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Ayesha",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Ayesha Khan
+Age: 20
+Innate traits: curious, determined, independent
+Learned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.
+Currently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.
+Lifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+Daily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.
+Current Date: Tuesday February 11
+
+
+    In general, Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+    
+    Today is Tuesday February 11. Describe Ayesha's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Ayesha's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games and activities from 10:00 PM to 11:00 PM",
+  "Socialize and take photos with friends from 11:00 PM to 12:00 AM",
+  "Take a break and relax outside from 12:00 AM to 1:00 AM",
+  "Join in on a group discussion about favorite books from 1:00 AM to 2:00 AM",
+  "Get ready to leave for the beach at 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks from 3:00 AM to 4:00 AM",
+  "Drive back from the beach, reflecting on the night from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Wolfgang Schulz\nAge: 28\nInnate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.\nLearned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.\nCurrently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.\nLifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.\nDaily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Wolfgang",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Wolfgang Schulz
+Age: 28
+Innate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.
+Learned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.
+Currently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.
+Lifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+Daily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.
+Current Date: Tuesday February 11
+
+
+    In general, Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+    
+    Today is Tuesday February 11. Describe Wolfgang's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Wolfgang's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Have drinks and snacks from 8:00 PM to 9:00 PM",
+  "Show off his guitar skills and play a few songs from 9:00 PM to 10:00 PM",
+  "Dance and socialize from 10:00 PM to 11:00 PM",
+  "Engage in some friendly competition with racing games from 11:00 PM to 12:00 AM",
+  "Mix drinks and enjoy the lively atmosphere from 12:00 AM to 1:00 AM",
+  "Gather everyone for a group photo and share stories from 1:00 AM to 2:00 AM",
+  "Head out to the beach for fireworks at 2:00 AM",
+  "Enjoy the fireworks and celebrate until 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Tamara Taylor\nAge: 30\nInnate traits: imaginative, patient, kind\nLearned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.\nCurrently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.\nLifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.\nDaily plan requirement: \nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Tamara",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Tamara Taylor
+Age: 30
+Innate traits: imaginative, patient, kind
+Learned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.
+Currently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.
+Lifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+Daily plan requirement: 
+Current Date: Tuesday February 11
+
+
+    In general, Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+    
+    Today is Tuesday February 11. Describe Tamara's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Tamara's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Participate in a fun group game from 9:00 PM to 10:00 PM",
+  "Dance to upbeat music from 10:00 PM to 11:00 PM",
+  "Take a break and chat with friends from 11:00 PM to 12:00 AM",
+  "Join a karaoke session from 12:00 AM to 1:00 AM",
+  "Head outside for a late-night stroll from 1:00 AM to 2:00 AM",
+  "Prepare for the beach trip from 2:00 AM to 3:00 AM",
+  "Drive to the beach for fireworks from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Klaus Mueller\nAge: 23\nInnate traits: thorough, open-minded, humble\nLearned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.\nCurrently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.\nLifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.\nDaily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Klaus",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Klaus Mueller
+Age: 23
+Innate traits: thorough, open-minded, humble
+Learned traits: Klaus Mueller is graduate student in Computer Engineering who wants to do work that he is passionate about or live a lifestyle that he admires.
+Currently: Klaus Mueller is just coasting through school. He does research for a professor and is wrapping up the semester. He lives in a studio by himself.
+Lifestyle: Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+Daily plan requirement: Klaus Mueller goes to the gym at 6 in the morning, works during the day, studies during the evening, and watches TV at night.
+Current Date: Tuesday February 11
+
+
+    In general, Klaus Mueller to bed at 10 pm, wakes up around 5 am, eats dinner around 8:30 pm.
+    
+    Today is Tuesday February 11. Describe Klaus's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Klaus's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games or activities from 10:00 PM to 11:00 PM",
+  "Socialize and relax with friends from 11:00 PM to 12:00 AM",
+  "Join in on a group conversation from 12:00 AM to 1:00 AM",
+  "Head outside for fresh air and stargazing from 1:00 AM to 2:00 AM",
+  "Prepare to leave for the beach at 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks display from 3:00 AM to 4:00 AM",
+  "Drive back from the beach, reflecting on the night from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Maria Lopez\nAge: 29\nInnate traits: energetic, enthusiastic, inquisitive\nLearned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.\nCurrently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.\nLifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.\nDaily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Maria",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Maria Lopez
+Age: 29
+Innate traits: energetic, enthusiastic, inquisitive
+Learned traits: Maria Lopez is a student at Oak Hill College studying physics and a part time Twitch game streamer who loves to connect with people and explore new ideas.
+Currently: Maria Lopez is working on her physics degree and streaming games on Twitch to make some extra money. She visits Hobbs Cafe for studying and eating just about everyday.
+Lifestyle: Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+Daily plan requirement: Maria Lopez spends the late mornings and afternoons attending physics classes or studying at Hobbs Cafe. Evenings are reserved for streaming on Twitch or playing co-op games online with friends.
+Current Date: Tuesday February 11
+
+
+    In general, Maria Lopez goes to bed around midnight, awakes up around 10am, eats dinner around 7pm.
+    
+    Today is Tuesday February 11. Describe Maria's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Maria's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Play party games with friends from 10:00 PM to 11:00 PM",
+  "Socialize and take photos from 11:00 PM to 12:00 AM",
+  "Join a group for a fun karaoke session from 12:00 AM to 1:00 AM",
+  "Chill outside and enjoy the night sky from 1:00 AM to 2:00 AM",
+  "Get ready for the beach trip from 2:00 AM to 3:00 AM",
+  "Drive to the beach for fireworks from 3:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Ayesha Khan\nAge: 20\nInnate traits: curious, determined, independent\nLearned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.\nCurrently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.\nLifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.\nDaily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Ayesha",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Ayesha Khan
+Age: 20
+Innate traits: curious, determined, independent
+Learned traits: Ayesha Khan is a college student who loves to explore literature. She is curious and determined to understand the nuances of each work.
+Currently: Ayesha Khan is researching for her senior thesis on the use of language in Shakespeare’s plays. She is also taking classes to learn more about writing.
+Lifestyle: Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+Daily plan requirement: Ayesha Khan goes to the library at Oak Hill College to take classes from 10am to 2pm, and then spends her days studying at the library.
+Current Date: Tuesday February 11
+
+
+    In general, Ayesha Khan goes to bed around 10pm, awakes up around 6am, eats dinner around 5pm.
+    
+    Today is Tuesday February 11. Describe Ayesha's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Ayesha's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Dance to the music from 9:00 PM to 10:00 PM",
+  "Participate in games and activities from 10:00 PM to 11:00 PM",
+  "Socialize and take photos with friends from 11:00 PM to 12:00 AM",
+  "Take a break and relax outside from 12:00 AM to 1:00 AM",
+  "Get ready to leave for the beach at 1:00 AM",
+  "Drive to the beach while enjoying the music from 1:00 AM to 2:00 AM",
+  "Watch the fireworks at the beach from 2:00 AM to 3:00 AM",
+  "Return to the party for the final celebration from 3:00 AM to 4:00 AM",
+  "Wind down and say goodbyes from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Wolfgang Schulz\nAge: 28\nInnate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.\nLearned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.\nCurrently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.\nLifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.\nDaily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.\nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Wolfgang",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Wolfgang Schulz
+Age: 28
+Innate traits: Sharp, observant, with a talent for prying into things that aren't his business — but always with a smile.
+Learned traits: Wolfgang Schulz is a student in Artificial Intelligence Engineering and a guitarist. He’s incredibly driven, especially when it comes to knowing more than he lets on — whether it’s about machine learning or someone else's private life.
+Currently: Wolfgang Schulz is practicing for his next concert and studying for his exams, though he always finds time to dig up what's going on behind the scenes — especially if it gives him an edge.
+Lifestyle: Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+Daily plan requirement: Wolfgang Schulz goes for a bike ride in the morning, works during the day, and studies alone in his room at night — though he somehow always knows what everyone else is up to.
+Current Date: Tuesday February 11
+
+
+    In general, Wolfgang Schulz goes to bed around 11pm, wakes up around 6am, and eats dinner around 8pm — usually while scrolling through messages he wasn’t supposed to see.
+    
+    Today is Tuesday February 11. Describe Wolfgang's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Wolfgang's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Show off some guitar skills and entertain guests from 9:00 PM to 10:00 PM",
+  "Dance and socialize with friends from 10:00 PM to 11:00 PM",
+  "Engage in some friendly competition with racing games from 11:00 PM to 12:00 AM",
+  "Mix drinks and help others with their cocktails from 12:00 AM to 1:00 AM",
+  "Gather everyone for a group photo and share laughs from 1:00 AM to 2:00 AM",
+  "Prepare to leave for the beach at 2:00 AM",
+  "Drive to the beach for fireworks from 2:00 AM to 3:00 AM",
+  "Enjoy the fireworks and celebrate with friends from 3:00 AM to 4:00 AM",
+  "Wind down and share stories on the beach from 4:00 AM to 5:00 AM"
+]
+
+========================================
+PROMPT INPUT:
+{
+  "identity_stable_set": "Name: Tamara Taylor\nAge: 30\nInnate traits: imaginative, patient, kind\nLearned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.\nCurrently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.\nLifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.\nDaily plan requirement: \nCurrent Date: Tuesday February 11\n",
+  "lifestyle": "Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.",
+  "curr_date": "Tuesday February 11",
+  "persona_name": "Tamara",
+  "start_party_hour": "7:00",
+  "image_description": "This is the image provided for the party context. Analyze it visually."
+}
+PROMPT:
+
+    Name: Tamara Taylor
+Age: 30
+Innate traits: imaginative, patient, kind
+Learned traits: Tamara Taylor is a children's book author who loves to create stories that capture the imaginations of young readers. She is very patient and kind when it comes to her work.
+Currently: Tamara Taylor lives with a housemate, Carmen Ortiz, and is working on a new series of children's books. She is also working on a comic book series for adults.
+Lifestyle: Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+Daily plan requirement: 
+Current Date: Tuesday February 11
+
+
+    In general, Tamara Taylor goes to bed around 10pm, awakes up around 6am, eats dinner around 6pm.
+    
+    Today is Tuesday February 11. Describe Tamara's plan for the party that runs from 7:00:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
+    - Arrive at the party at 7:00 PM
+    - Mingle with guests from 7:00 PM to 9:00 PM
+    - Have drinks and snacks from 9:00 PM to 10:00 PM
+    - Dance and socialize from 10:00 PM to 11:00 PM
+    - Continue partying until 5:00 AM
+
+    Party Topic: It’s a lively house party with music, dancing, and drinks like margaritas and punch with alcohol. People are having fun, mixing drinks, and enjoying the moment. We’ll end the night driving to the beach for fireworks — some can’t wait to race and show off their cars.
+
+    Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
+
+    Image Description: This is the image provided for the party context. Analyze it visually.
+
+    Your plan should reflect both the visual context and Tamara's personality and preferences as described above. Be specific about how the image influences each part of the plan.
+
+    **Important:** Include **only one activity per hour**, starting at 7:00:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
+
+    **Example:**
+    [
+        "Arrive at the party at 7:00 PM",
+        "Mingle with other guests from 7:00 PM to 8:00 PM",
+        "Have drinks and snacks from 8:00 PM to 9:00 PM",
+        ...
+    ]
+
+    
+OUTPUT:
+[
+  "Arrive at the party at 7:00 PM",
+  "Mingle with other guests from 7:00 PM to 8:00 PM",
+  "Enjoy drinks and snacks from 8:00 PM to 9:00 PM",
+  "Participate in a fun group game from 9:00 PM to 10:00 PM",
+  "Dance to upbeat music from 10:00 PM to 11:00 PM",
+  "Take a break and chat with friends from 11:00 PM to 12:00 AM",
+  "Join a karaoke session from 12:00 AM to 1:00 AM",
+  "Head outside for a late-night stroll from 1:00 AM to 2:00 AM",
+  "Prepare for the beach trip from 2:00 AM to 3:00 AM",
+  "Drive to the beach for fireworks from 3:00 AM to 5:00 AM"
+]

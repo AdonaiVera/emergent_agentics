@@ -16,7 +16,7 @@ from openai import AzureOpenAI, OpenAI
 from utils import openai_api_key, use_openai, api_model
 from openai_cost_logger import DEFAULT_LOG_PATH
 from persona.prompt_template.openai_logger_singleton import OpenAICostLogger_Singleton
-
+import os
 config_path = Path("../../openai_config.json")
 with open(config_path, "r") as f:
     openai_config = json.load(f) 
@@ -119,6 +119,67 @@ cost_logger = OpenAICostLogger_Singleton(
 def temp_sleep(seconds=0.1):
     time.sleep(seconds)
 
+def ChatGPT_single_request_multimodal(prompt, image_path=None):
+    """
+    Multimodal version of ChatGPT_single_request that can handle images.
+    
+    INPUT:
+        prompt: The text prompt
+        image_path: Optional path to image file
+    OUTPUT:
+        Response from GPT-4 Vision API
+    """
+    temp_sleep()
+    
+    # Prepare image for OpenAI Vision API if provided
+    if image_path and os.path.exists(image_path):
+        try:
+            from PIL import Image
+            import io
+            import base64
+            
+            # Convert image to base64
+            with Image.open(image_path) as img:
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                max_size = (1024, 1024)
+                if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
+                    try:
+                        img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                    except AttributeError:
+                        img.thumbnail(max_size, Image.LANCZOS)
+                buffer = io.BytesIO()
+                img.save(buffer, format='JPEG', quality=85)
+                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            
+            # Create multimodal message
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
+                    ]
+                }
+            ]
+            
+            # Call OpenAI Vision API
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=messages,
+                temperature=0
+            )
+            
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            print(f"❌ [MULTIMODAL] Error processing image {image_path}: {e}")
+            # Fallback to text-only
+            return ChatGPT_single_request(prompt)
+    else:
+        # No image provided, use text-only
+        return ChatGPT_single_request(prompt)
+    
 
 def ChatGPT_single_request(prompt):
     temp_sleep()

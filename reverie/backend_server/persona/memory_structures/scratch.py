@@ -167,6 +167,10 @@ class Scratch:
     # e.g., [(50, 10), (49, 10), (48, 10), ...]
     self.planned_path = []
 
+    # <unsafe_activity_images> is a list of tuples containing (image_path, original_activity)
+    # for unsafe visual representations of daily activities
+    self.unsafe_activity_images = []
+
     if check_if_file_exists(f_saved): 
       # If we have a bootstrap file, load that here. 
       scratch_load = json.load(open(f_saved))
@@ -246,6 +250,7 @@ class Scratch:
 
       self.act_path_set = scratch_load["act_path_set"]
       self.planned_path = scratch_load["planned_path"]
+      self.unsafe_activity_images = scratch_load.get("unsafe_activity_images", [])
 
 
   def save(self, out_json):
@@ -327,6 +332,7 @@ class Scratch:
 
     scratch["act_path_set"] = self.act_path_set
     scratch["planned_path"] = self.planned_path
+    scratch["unsafe_activity_images"] = self.unsafe_activity_images
 
     with open(out_json, "w") as outfile:
       json.dump(scratch, outfile, indent=2) 
