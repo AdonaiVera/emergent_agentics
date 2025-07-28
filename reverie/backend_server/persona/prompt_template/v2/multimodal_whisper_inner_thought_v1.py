@@ -140,7 +140,7 @@ def run_gpt_prompt_generate_multimodal_whisper_inner_thought(
             print(f"✅ [VISION] OpenAI Vision API response received: {len(thought)} characters")
             print(f"🧠 [VISION] Generated thought: {thought[:100]}...")
             
-            return thought, [thought, prompt, {"model": "gpt-4o-mini"}, prompt_input, "..." ]
+            return thought, [thought, prompt, {"model": "gpt-4o"}, prompt_input, "..." ]
             
         except Exception as e:
             print(f"❌ [VISION] Error calling OpenAI Vision API: {e}")

@@ -652,6 +652,7 @@ def combine_metrics(folders: List[str]) -> Dict:
         'whisper_history': [],
         'interaction_counts': {},
         'plan_changes': {},
+        'schedule_changes': {},
         'interaction_density': [],
         'acceptance_rejection': {
             'accept': 0,
@@ -765,6 +766,12 @@ def combine_metrics(folders: List[str]) -> Dict:
             if agent not in combined_metrics['plan_changes']:
                 combined_metrics['plan_changes'][agent] = []
             combined_metrics['plan_changes'][agent].extend(changes)
+        
+        # Combine schedule_changes
+        for agent, changes in metrics.get('schedule_changes', {}).items():
+            if agent not in combined_metrics['schedule_changes']:
+                combined_metrics['schedule_changes'][agent] = []
+            combined_metrics['schedule_changes'][agent].extend(changes)
         
         # Combine interaction_density
         combined_metrics['interaction_density'].extend(metrics.get('interaction_density', []))
@@ -1022,7 +1029,7 @@ def _analyze_whisper_sequence(whisper_history):
 if __name__ == "__main__":
     # Change manually to the path 
     base_metrics_file = "environment/frontend_server/storage/"
-    test_prefix = "party_experiment_os_1_whisper_50-s-"
+    test_prefix = "crossmodality_plan_version10-s-"
     #test_prefix = "medical_experiment_1_whisper_1-s-"    
 
     output_dir = "visualizations"

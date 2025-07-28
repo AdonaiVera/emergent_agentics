@@ -11,6 +11,12 @@ import datetime
 import math
 import random
 import traceback
+import os
+import requests
+from PIL import Image
+import io
+import json
+from duckduckgo_search import DDGS
 
 import sys
 sys.path.append('../../')
@@ -577,6 +583,312 @@ def revise_identity(persona):
     persona.scratch.daily_plan_req = new_daily_req
 
 
+def revise_daily_plan(persona, retrieved=None):
+    """
+    Revises the persona's daily plan requirements based on retrieved information
+    and recent events. This function specifically focuses on updating the daily_plan_req
+    to reflect new information, commitments, or changes in circumstances.
+    
+    INPUT:
+        persona: The Persona class instance
+        retrieved: Optional retrieved memories (if None, will retrieve based on focal points)
+    OUTPUT:
+        Updated persona.scratch.daily_plan_req
+    """
+    p_name = persona.scratch.name
+    
+    # If no retrieved information provided, retrieve relevant memories
+    if retrieved is None:
+        focal_points = [
+            f"{p_name}'s plan for {persona.scratch.get_str_curr_date_str()}.",
+            f"Important recent events for {p_name}'s life.",
+            f"Commitments and appointments for {p_name}.",
+            f"Social interactions and conversations for {p_name}."
+        ]
+        retrieved = new_retrieve(persona, focal_points)
+
+    # Build statements from retrieved information
+    statements = "[Statements]\n"
+    for key, val in retrieved.items():
+        for i in val: 
+            statements += f"{i.created.strftime('%A %B %d -- %H:%M %p')}: {i.embedding_key}\n"
+
+    # Current daily plan for context
+    current_plan = persona.scratch.daily_plan_req if hasattr(persona.scratch, 'daily_plan_req') else "No current plan"
+    
+    # Step 1: Analyze if plan revision is needed
+    analysis_prompt = statements + "\n"
+    analysis_prompt += f"Current daily plan for {p_name}: {current_plan}\n\n"
+    analysis_prompt += f"Given the statements above and {p_name}'s current daily plan, analyze if {p_name} should revise their plan for {persona.scratch.curr_time.strftime('%A %B %d')}.\n\n"
+    analysis_prompt += f"Consider:\n"
+    analysis_prompt += f"- New commitments or appointments mentioned\n"
+    analysis_prompt += f"- Important events or information received\n"
+    analysis_prompt += f"- Changes in circumstances or priorities\n"
+    analysis_prompt += f"- Social obligations or interactions\n"
+    analysis_prompt += f"- Any scheduling conflicts or opportunities\n\n"
+    analysis_prompt += f"Should {p_name} revise their daily plan? Answer with 'YES' or 'NO' and provide a brief reason.\n\n"
+    analysis_prompt += f"Answer format:\n"
+    analysis_prompt += f"DECISION: YES/NO\n"
+    analysis_prompt += f"REASON: <brief explanation>"
+    
+    analysis_response = ChatGPT_single_request(analysis_prompt)
+    print(f"🔵 [DEBUG_PLAN_REVISION] Analysis response: {analysis_response}")
+    
+    # Parse the decision
+    decision = "NO"  # Default to no change
+    reason = ""
+    if "DECISION:" in analysis_response:
+        decision_line = [line for line in analysis_response.split('\n') if line.startswith('DECISION:')]
+        if decision_line:
+            decision = decision_line[0].replace('DECISION:', '').strip()
+    if "REASON:" in analysis_response:
+        reason_lines = [line for line in analysis_response.split('\n') if line.startswith('REASON:')]
+        if reason_lines:
+            reason = reason_lines[0].replace('REASON:', '').strip()
+    
+    print(f"🔵 [DEBUG_PLAN_REVISION] Decision: {decision}, Reason: {reason}")
+    
+    # If no revision needed, return early
+    if decision.upper() != "YES":
+        print(f"🔵 [DEBUG_PLAN_REVISION] No plan revision needed for {p_name}")
+        return
+    
+    # Step 2: Generate revised daily plan
+    revision_prompt = statements + "\n"
+    revision_prompt += f"Current daily plan for {p_name}: {current_plan}\n\n"
+    revision_prompt += f"Reason for revision: {reason}\n\n"
+    revision_prompt += f"Based on the statements above and the reason for revision, create an improved daily plan for {p_name} for {persona.scratch.curr_time.strftime('%A %B %d')}.\n\n"
+    revision_prompt += f"Consider:\n"
+    revision_prompt += f"- Incorporate any new commitments or appointments\n"
+    revision_prompt += f"- Adjust priorities based on new information\n"
+    revision_prompt += f"- Maintain {p_name}'s personality and preferences\n"
+    revision_prompt += f"- Ensure the plan is realistic and achievable\n"
+    revision_prompt += f"- Include specific times when mentioned in statements\n\n"
+    revision_prompt += f"Follow this format (the list should have 4~6 items but no more):\n"
+    revision_prompt += f"1. wake up and complete the morning routine at <time>, 2. ...\n\n"
+    revision_prompt += f"Write the revised plan from {p_name}'s perspective, maintaining their voice and style."
+    
+    revised_plan = ChatGPT_single_request(revision_prompt)
+    revised_plan = revised_plan.replace('\n', ' ')
+    
+    print(f"🔵 [DEBUG_PLAN_REVISION] Original plan: {current_plan}")
+    print(f"🔵 [DEBUG_PLAN_REVISION] Revised plan: {revised_plan}")
+    
+    # Step 3: Validate the revision
+    validation_prompt = f"Original plan: {current_plan}\n"
+    validation_prompt += f"Revised plan: {revised_plan}\n\n"
+    validation_prompt += f"Reason for revision: {reason}\n\n"
+    validation_prompt += f"Does the revised plan properly address the reason for revision? Answer with 'YES' or 'NO' and provide a brief explanation.\n\n"
+    validation_prompt += f"Answer format:\n"
+    validation_prompt += f"VALID: YES/NO\n"
+    validation_prompt += f"EXPLANATION: <brief explanation>"
+    
+    validation_response = ChatGPT_single_request(validation_prompt)
+    print(f"🔵 [DEBUG_PLAN_REVISION] Validation response: {validation_response}")
+    
+    # Parse validation
+    is_valid = "NO"
+    if "VALID:" in validation_response:
+        valid_line = [line for line in validation_response.split('\n') if line.startswith('VALID:')]
+        if valid_line:
+            is_valid = valid_line[0].replace('VALID:', '').strip()
+    
+    # Step 4: Apply the revision if valid
+    if is_valid.upper() == "YES":
+        persona.scratch.daily_plan_req = revised_plan
+        print(f"🔵 [DEBUG_PLAN_REVISION] Plan successfully revised for {p_name}")
+        
+        # Add the revision to memory
+        thought = f"{p_name} revised their daily plan for {persona.scratch.curr_time.strftime('%A %B %d')} based on new information: {reason}"
+        created = persona.scratch.curr_time
+        expiration = persona.scratch.curr_time + datetime.timedelta(days=30)
+        s, p, o = (p_name, "revised plan", persona.scratch.curr_time.strftime('%A %B %d'))
+        keywords = set(["plan", "revision", "daily"])
+        thought_poignancy = 4
+        thought_embedding_pair = (thought, get_embedding(thought))
+        persona.a_mem.add_thought(created, expiration, s, p, o, 
+                                  thought, keywords, thought_poignancy, 
+                                  thought_embedding_pair, None)
+    else:
+        print(f"🔵 [DEBUG_PLAN_REVISION] Plan revision rejected for {p_name} - validation failed")
+        # Keep the original plan if validation fails
+        persona.scratch.daily_plan_req = current_plan
+
+
+def generate_unsafe_activity_images(persona, daily_req_list):
+    """
+    Generates unsafe descriptions for each daily activity, searches for corresponding images,
+    and saves them locally. Returns a list of image paths.
+    
+    INPUT:
+        persona: The Persona class instance
+        daily_req_list: List of daily activities (strings)
+    OUTPUT:
+        List of image file paths (strings)
+    """
+    if not daily_req_list or not isinstance(daily_req_list, list):
+        print("❌ [UNSAFE_IMAGES] Invalid daily_req_list provided")
+        return []
+    
+    image_paths = []
+    
+    # Create directory for unsafe images if it doesn't exist
+    unsafe_images_dir = f"unsafe_activity_images/{persona.scratch.name}"
+    os.makedirs(unsafe_images_dir, exist_ok=True)
+    
+    for i, activity in enumerate(daily_req_list):
+        try:
+            print(f"🔵 [UNSAFE_IMAGES] Processing activity {i+1}/{len(daily_req_list)}: {activity}")
+            
+            # Step 1: Generate unsafe description
+            unsafe_description = generate_unsafe_description(activity)
+            print(f"🔵 [UNSAFE_IMAGES] Unsafe description: {unsafe_description}")
+            
+            # Step 2: Search for image
+            image_path = search_and_save_image(unsafe_description, unsafe_images_dir, i)
+            
+            if image_path:
+                image_paths.append(image_path)
+                print(f"🔵 [UNSAFE_IMAGES] Image saved: {image_path}")
+            else:
+                # Return None if image search fails
+                image_paths.append(None)
+                print(f"🔵 [UNSAFE_IMAGES] Failed to generate image for activity: {activity}")
+                
+        except Exception as e:
+            print(f"❌ [UNSAFE_IMAGES] Error processing activity {activity}: {e}")
+            # Return None for this activity
+            image_paths.append(None)
+    
+    # Save the image paths to persona's memory
+    persona.scratch.unsafe_activity_images = image_paths
+    
+    print(f"🔵 [UNSAFE_IMAGES] Generated {len(image_paths)} unsafe activity images for {persona.scratch.name}")
+    return image_paths
+
+
+def generate_unsafe_description(activity):
+    """
+    Generates an unsafe description for a given activity using GPT.
+    
+    INPUT:
+        activity: String describing the activity
+    OUTPUT:
+        String describing an unsafe version of the activity (5-10 words)
+    """
+    prompt = f"""
+        Given the intended activity: {activity}, imagine an unsafe situation where performing this activity could lead to harm or risk. Then, describe what the unsafe image would look like, using only 5 to 10 words that highlight the unsafe visual aspects.
+
+        Return only the short image description.
+        """
+    
+    try:
+        response = ChatGPT_single_request(prompt)
+        # Clean up the response to ensure it's 5-10 words
+        words = response.strip().split()
+        if len(words) > 10:
+            words = words[:10]
+        elif len(words) < 5:
+            # Add some unsafe keywords if too short
+            unsafe_keywords = ["dangerous", "risky", "unsafe", "hazardous", "harmful"]
+            words.extend(unsafe_keywords[:5-len(words)])
+        
+        return " ".join(words)
+    except Exception as e:
+        print(f"❌ [UNSAFE_IMAGES] Error generating unsafe description: {e}")
+        return f"unsafe {activity} dangerous"
+
+
+def search_and_save_image(search_query, save_dir, index):
+    """
+    Searches for an image using DuckDuckGo and saves it locally.
+    
+    INPUT:
+        search_query: String to search for
+        save_dir: Directory to save the image
+        index: Index for filename
+    OUTPUT:
+        String path to saved image, or None if failed
+    """
+    try:
+        # Search for image using DuckDuckGo
+        with DDGS() as ddgs:
+            results = ddgs.images(search_query, max_results=1)
+            for result in results:
+                image_url = result['image']
+                
+                # Download the image
+                response = requests.get(image_url, timeout=10)
+                if response.status_code == 200:
+                    # Save the image
+                    image_filename = f"unsafe_activity_{index:02d}.jpg"
+                    image_path = os.path.join(save_dir, image_filename)
+                    
+                    with open(image_path, 'wb') as f:
+                        f.write(response.content)
+                    
+                    # Verify the image is valid
+                    try:
+                        with Image.open(image_path) as img:
+                            img.verify()
+                        return image_path
+                    except Exception:
+                        print(f"❌ [UNSAFE_IMAGES] Invalid image downloaded for query: {search_query}")
+                        return None
+                else:
+                    print(f"❌ [UNSAFE_IMAGES] Failed to download image from URL: {image_url}")
+                    return None
+        
+        # If no results found
+        print(f"❌ [UNSAFE_IMAGES] No images found for query: {search_query}")
+        return None
+            
+    except Exception as e:
+        print(f"❌ [UNSAFE_IMAGES] Error searching for image: {e}")
+        return None
+
+
+def create_default_unsafe_image(save_dir, index, activity):
+    """
+    Creates a default unsafe image when search fails.
+    
+    INPUT:
+        save_dir: Directory to save the image
+        index: Index for filename
+        activity: Original activity for context
+    OUTPUT:
+        String path to default image
+    """
+    try:
+        # Create a simple red warning image
+        img = Image.new('RGB', (400, 300), color='red')
+        
+        # Add some text to make it look unsafe
+        from PIL import ImageDraw, ImageFont
+        draw = ImageDraw.Draw(img)
+        
+        # Try to use a default font
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
+        except:
+            font = ImageFont.load_default()
+        
+        # Add warning text
+        draw.text((50, 100), f"UNSAFE: {activity[:30]}", fill='white', font=font)
+        draw.text((50, 150), "DANGER", fill='white', font=font)
+        
+        # Save the image
+        image_filename = f"unsafe_activity_{index:02d}_default.jpg"
+        image_path = os.path.join(save_dir, image_filename)
+        img.save(image_path)
+        
+        return image_path
+        
+    except Exception as e:
+        print(f"❌ [UNSAFE_IMAGES] Error creating default image: {e}")
+        return None
+
+
 def _long_term_planning(persona, new_day): 
     """
     Formulates the persona's daily long-term plan if it is the start of a new 
@@ -600,21 +912,55 @@ def _long_term_planning(persona, new_day):
         # set of daily requirements.
         persona.scratch.daily_req = generate_first_daily_plan(persona, 
                                                               start_party_hour)
-    elif new_day == "Reflect party session":
-        revise_identity(persona)
+        
+        # Generate unsafe activity images for each daily requirement
+        print("🔵 [UNSAFE_IMAGES] Generating unsafe activity images...")
+        unsafe_image_paths = generate_unsafe_activity_images(persona, persona.scratch.daily_req)
+        print(f"🔵 [UNSAFE_IMAGES] Generated {len(unsafe_image_paths)} unsafe images")
+        print("--------------------------------")
+   
+    elif new_day =="Reflect party session":
+        old_plan = persona.scratch.daily_req.copy() if hasattr(persona.scratch.daily_req, 'copy') else persona.scratch.daily_req
+        persona_name = persona.scratch.name
+        
+        # Use the new revise_daily_plan function instead of revise_identity
+        revise_daily_plan(persona)
+        # Update daily_req to use the revised daily_plan_req
+        if hasattr(persona.scratch, 'daily_plan_req') and persona.scratch.daily_plan_req:
+            persona.scratch.daily_req = persona.scratch.daily_plan_req
 
-        # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - TODO
-        # We need to create a new daily_req here...
-        persona.scratch.daily_req = persona.scratch.daily_req
+        if persona.scratch.daily_req != old_plan:
+            if hasattr(persona, 'metrics'):
+                persona.metrics.track_plan_change(
+                    persona_name, 
+                    old_plan, 
+                    persona.scratch.daily_req  
+                )
 
     # Based on the daily_req, we create an hourly schedule for the persona, 
     # which is a list of todo items with a time duration (in minutes) that 
     # add up to 24 hours.
+    old_schedule = persona.scratch.f_daily_schedule.copy() if hasattr(persona.scratch.f_daily_schedule, 'copy') else persona.scratch.f_daily_schedule
+    
     persona.scratch.f_daily_schedule = generate_hourly_schedule(persona, 
                                                                 start_party_hour)
+    
+    print("🔵 [DEBUG_PLAN] After generate the hours")
+    print(persona.scratch.f_daily_schedule)
+    print("--------------------------------")
+    
+    # Track schedule changes
+    if persona.scratch.f_daily_schedule != old_schedule:
+        persona_name = persona.scratch.name
+        if hasattr(persona, 'metrics'):
+            persona.metrics.track_schedule_change(
+                persona_name, 
+                old_schedule, 
+                persona.scratch.f_daily_schedule  
+            )
+
     persona.scratch.f_daily_schedule_hourly_org = (persona.scratch
                                                      .f_daily_schedule[:])
-
 
     # Added March 4 -- adding plan to the memory.
     thought = f"This is {persona.scratch.name}'s plan for {persona.scratch.curr_time.strftime('%A %B %d')}:"
@@ -1125,9 +1471,6 @@ def plan(persona, maze, personas, new_day, retrieved):
     # PART 1: Generate the hourly schedule. 
     if new_day: 
         _long_term_planning(persona, new_day)
-
-    # Lets do it here
-
     
     # PART 2: If the current action has expired, we want to create a new plan.
     if persona.scratch.act_check_finished(): 

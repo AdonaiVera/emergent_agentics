@@ -24,6 +24,7 @@ reverie/backend_server/tools
 
 # Ignore dataset
 reverie/backend_server/mssbench/
+reverie/backend_server/unsafe_activity_images/
 
 # Ignore figures
 cross_modal_consistency_good_one.png

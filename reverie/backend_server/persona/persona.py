@@ -173,7 +173,7 @@ class Persona:
         """
         reflect(self)
 
-    def move(self, maze, personas, curr_tile, curr_time):
+    def move(self, maze, personas, curr_tile, curr_time, curr_step=None):
         """
         This is the main cognitive function where our main sequence is called. 
 
@@ -184,6 +184,7 @@ class Persona:
             curr_tile: A tuple that designates the persona's current tile location 
                        in (row, col) form. e.g., (58, 39)
             curr_time: datetime instance that indicates the game's current time. 
+            curr_step: Integer indicating the current step number in the simulation.
         OUTPUT: 
             execution: A triple set that contains the following components: 
                 <next_tile> is a x,y coordinate. e.g., (58, 9)
@@ -194,16 +195,22 @@ class Persona:
         """
         # Updating persona's scratch memory with <curr_tile>. 
         self.scratch.curr_tile = curr_tile
+        
+        # Update current step if provided
+        if curr_step is not None:
+            self.scratch.curr_step = curr_step
 
         # We figure out whether the persona started a new party session, and if it is a new
         # party session, whether it is the very first party of the simulation. This is 
         # important because we set up the persona's long term plan at the start of
         # a new party session. 
         new_day = False
+
         if not self.scratch.curr_time: 
             new_day = "New Party Session"
-        elif ((curr_time - self.scratch.curr_time).total_seconds() >= 7200):
+        elif curr_step is not None and (curr_step - self.scratch.last_reflection_step) >= self.scratch.reflection_step_interval:  
             new_day = "Reflect party session"
+            self.scratch.last_reflection_step = curr_step
         self.scratch.curr_time = curr_time
 
         # Main cognitive sequence begins here. 

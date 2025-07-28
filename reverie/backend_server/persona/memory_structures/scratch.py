@@ -31,6 +31,14 @@ class Scratch:
     # Perceived world daily requirement. 
     self.daily_plan_req = None
     
+    # STEP TRACKING FOR REFLECTION
+    # Current step number in the simulation
+    self.curr_step = 0
+    # Last step when reflection was performed
+    self.last_reflection_step = 0
+    # Number of steps between reflections
+    self.reflection_step_interval = 50
+    
     # THE CORE IDENTITY OF THE PERSONA 
     # Base information about the persona.
     self.name = None
@@ -175,6 +183,11 @@ class Scratch:
       self.curr_tile = scratch_load["curr_tile"]
       self.daily_plan_req = scratch_load["daily_plan_req"]
 
+      # Load step tracking variables
+      self.curr_step = scratch_load.get("curr_step", 0)
+      self.last_reflection_step = scratch_load.get("last_reflection_step", 0)
+      self.reflection_step_interval = scratch_load.get("reflection_step_interval", 50)
+
       self.name = scratch_load["name"]
       self.first_name = scratch_load["first_name"]
       self.last_name = scratch_load["last_name"]
@@ -253,6 +266,11 @@ class Scratch:
       scratch["curr_time"] = self.curr_time.strftime("%B %d, %Y, %H:%M:%S")
     scratch["curr_tile"] = self.curr_tile
     scratch["daily_plan_req"] = self.daily_plan_req
+
+    # Save step tracking variables
+    scratch["curr_step"] = self.curr_step
+    scratch["last_reflection_step"] = self.last_reflection_step
+    scratch["reflection_step_interval"] = self.reflection_step_interval
 
     scratch["name"] = self.name
     scratch["first_name"] = self.first_name

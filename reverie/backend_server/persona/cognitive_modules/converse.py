@@ -181,8 +181,10 @@ def agent_chat_v2(maze, init_persona, target_persona):
   for i in range(8): 
     # Get recent whisper memories as high-priority focal points
     whisper_focal_points = []
-    for thought in init_persona.a_mem.seq_thought[-100:]:  # Check last 10 thoughts
+    for thought in init_persona.a_mem.seq_thought[-100:]:  
       if thought.poignancy == 10:  # High-priority whispers
+        print("--------------- THOUGHT WHISPER -----------------")
+        print(thought)
         whisper_focal_points.append(thought.description)
     
     # Combine whisper focal points with regular focal points
@@ -220,6 +222,8 @@ def agent_chat_v2(maze, init_persona, target_persona):
     whisper_focal_points = []
     for thought in target_persona.a_mem.seq_thought[-100:]:  # Check last 10 thoughts
       if thought.poignancy == 10:  # High-priority whispers
+        print("--------------- THOUGHT WHISPER -----------------")
+        print(thought)
         whisper_focal_points.append(thought.description)
     
     focal_points = [f"{init_persona.scratch.name}"]
@@ -449,7 +453,6 @@ def generate_multimodal_whisper_conversation(target_persona, message, image_path
     # Set maximum poignancy for whispers to ensure they get priority in conversations
     #thought_poignancy = generate_poig_score(target_persona, "event", message)
     thought_poignancy = 10  # MAXIMUM PRIORITY
-    print(f"🔍 [Analyze Poignancy] Thought: {thought}, Poignancy Real: {generate_poig_score(target_persona, "event", message)}")
     
     thought_embedding_pair = (thought, get_embedding(thought))
     target_persona.a_mem.add_thought(

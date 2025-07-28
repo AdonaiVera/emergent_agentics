@@ -226,76 +226,67 @@ def new_retrieve(persona, focal_points, n_count=30):
     persona = <persona> object 
     focal_points = ["How are you?", "Jane is swimming in the pond"]
   """
-  try:
-    # Use CoT-enhanced retrieval
-    if debug:
-      print("Using CoT-enhanced memory retrieval")
-    #return new_retrieve_cot(persona, focal_points, n_count)
-  except Exception as e:
-    if debug:
-      print(f"CoT retrieval failed, falling back to original method: {e}")
-    
-    # Fallback to original method
-    print("-------- new_retrieve ----------")
-    print("Number of focal_points: ", len(focal_points), flush=True)
+  # Use original method since CoT is commented out
+  print("-------- new_retrieve ----------")
+  print("Number of focal_points: ", len(focal_points), flush=True)
 
-    # <retrieved> is the main dictionary that we are returning
-    retrieved = dict()
+  # <retrieved> is the main dictionary that we are returning
+  retrieved = dict()
 
-    for focal_pt in focal_points:
-      # Getting all nodes from the agent's memory (both thoughts and events) and
-      # sorting them by the datetime of creation.
-      # You could also imagine getting the raw conversation, but for now. 
-      nodes = [[i.last_accessed, i]
-                for i in persona.a_mem.seq_event + persona.a_mem.seq_thought
-                if "idle" not in i.embedding_key]
-      nodes = sorted(nodes, key=lambda x: x[0])
-      nodes = [i for created, i in nodes]
+  for focal_pt in focal_points:
+    # Getting all nodes from the agent's memory (both thoughts and events) and
+    # sorting them by the datetime of creation.
+    # You could also imagine getting the raw conversation, but for now. 
+    nodes = [[i.last_accessed, i]
+              for i in persona.a_mem.seq_event + persona.a_mem.seq_thought
+              if "idle" not in i.embedding_key]
+    nodes = sorted(nodes, key=lambda x: x[0])
+    nodes = [i for created, i in nodes]
 
-      # Calculating the component dictionaries and normalizing them.
-      recency_out = extract_recency(persona, nodes)
-      recency_out = normalize_dict_floats(recency_out, 0, 1)
-      importance_out = extract_importance(persona, nodes)
-      importance_out = normalize_dict_floats(importance_out, 0, 1)  
-      relevance_out = extract_relevance(persona, nodes, focal_pt)
-      relevance_out = normalize_dict_floats(relevance_out, 0, 1)
+    # Calculating the component dictionaries and normalizing them.
+    recency_out = extract_recency(persona, nodes)
+    recency_out = normalize_dict_floats(recency_out, 0, 1)
+    importance_out = extract_importance(persona, nodes)
+    importance_out = normalize_dict_floats(importance_out, 0, 1)  
+    relevance_out = extract_relevance(persona, nodes, focal_pt)
+    relevance_out = normalize_dict_floats(relevance_out, 0, 1)
 
-      # Computing the final scores that combines the component values. 
-      # Note to self: test out different weights. [1, 1, 1] tends to work
-      # decently, but in the future, these weights should likely be learned, 
-      # perhaps through an RL-like process.
-      # gw = [1, 1, 1]
-      # gw = [1, 2, 1]
-      gw = [0.5, 3, 2]
-      master_out = dict()
-      for key in recency_out.keys(): 
-        master_out[key] = (persona.scratch.recency_w*recency_out[key]*gw[0] 
-                       + persona.scratch.relevance_w*relevance_out[key]*gw[1] 
-                       + persona.scratch.importance_w*importance_out[key]*gw[2])
+    # Computing the final scores that combines the component values. 
+    # Note to self: test out different weights. [1, 1, 1] tends to work
+    # decently, but in the future, these weights should likely be learned, 
+    # perhaps through an RL-like process.
+    # gw = [1, 1, 1]
+    # gw = [1, 2, 1]
+    gw = [0.5, 3, 2]
+    master_out = dict()
+    for key in recency_out.keys(): 
+      master_out[key] = (persona.scratch.recency_w*recency_out[key]*gw[0] 
+                     + persona.scratch.relevance_w*relevance_out[key]*gw[1] 
+                     + persona.scratch.importance_w*importance_out[key]*gw[2])
 
-      master_out = top_highest_x_values(master_out, len(master_out.keys()))
+    master_out = top_highest_x_values(master_out, len(master_out.keys()))
 
-      print("\n-------- focal_pt: ", focal_pt, flush=True)
-      for key, val in master_out.items():
-        print("key: ", persona.a_mem.id_to_node[key].embedding_key, " val: ", val)
-        print(
-          "recency: ", persona.scratch.recency_w*recency_out[key]*1,
-          " relevance: ", persona.scratch.relevance_w*relevance_out[key]*1,
-          " importance: ", persona.scratch.importance_w*importance_out[key]*1
-        )
-      print(flush=True)
+    print("\n-------- focal_pt: ", focal_pt, flush=True)
+    for key, val in master_out.items():
+      print("key: ", persona.a_mem.id_to_node[key].embedding_key, " val: ", val)
+      print(
+        "recency: ", persona.scratch.recency_w*recency_out[key]*1,
+        " relevance: ", persona.scratch.relevance_w*relevance_out[key]*1,
+        " importance: ", persona.scratch.importance_w*importance_out[key]*1
+      )
+    print(flush=True)
 
-      # Extracting the highest x values.
-      # <master_out> has the key of node.id and value of float. Once we get the 
-      # highest x values, we want to translate the node.id into nodes and return
-      # the list of nodes.
-      master_out = top_highest_x_values(master_out, n_count)
-      master_nodes = [persona.a_mem.id_to_node[key]
-                      for key in list(master_out.keys())]
+    # Extracting the highest x values.
+    # <master_out> has the key of node.id and value of float. Once we get the 
+    # highest x values, we want to translate the node.id into nodes and return
+    # the list of nodes.
+    master_out = top_highest_x_values(master_out, n_count)
+    master_nodes = [persona.a_mem.id_to_node[key]
+                    for key in list(master_out.keys())]
 
-      for n in master_nodes:
-        n.last_accessed = persona.scratch.curr_time
+    for n in master_nodes:
+      n.last_accessed = persona.scratch.curr_time
 
-      retrieved[focal_pt] = master_nodes
+    retrieved[focal_pt] = master_nodes
 
-    return retrieved
+  return retrieved

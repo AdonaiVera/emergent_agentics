@@ -30,13 +30,22 @@ party_topic = "It's a Speed Friending night designed to help guests meet as many
 '''
 
 party_topic = (
+    "It's a lively house party buzzing with energy — glasses clink, laughter echoes, "
+    "and the air is filled with the sweet scent of margaritas, daiquiris, and spiked punch. "
+    "People are dancing, chatting, and leaning over the kitchen counter mixing new concoctions. "
+    "The vibe is carefree, everyone soaking in the moment, knowing the night doesn’t end here. "
+    "Once the music winds down, we’re all jumping into our cars, heading toward the beach to catch the fireworks show. "
+    "Some are already teasing about racing there — engines revving, friendly competition brewing, and summer adventure ahead. "
+)
+
+'''
+party_topic = (
     "It's a relaxed 'Karaoke and Chill' night with music playing in the background, "
     "a makeshift stage in the living room, and people casually taking turns on the mic "
     "while others hang out in the kitchen or lounge on the couch. "
     "Whisper some of your memories as you engage with the scene."
 )
 
-'''
 party_topic = (
     "It's a quiet doctor's office waiting room with soft lighting, rows of chairs along the walls, "
     "and a small table holding magazines. People sit silently checking their phones or flipping through brochures, "
@@ -73,7 +82,6 @@ def create_prompt(prompt_input: dict[str, Any]):
 
 class DailyPlan(BaseModel):
     daily_plan: list[str]
-
 
 def run_gpt_prompt_daily_plan(persona, start_party_hour, test_input=None, verbose=False):
     """

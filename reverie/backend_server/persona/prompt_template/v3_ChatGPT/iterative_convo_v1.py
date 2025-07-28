@@ -158,6 +158,11 @@ def run_gpt_generate_iterative_chat_utt(
     maze, init_persona, target_persona, retrieved, curr_context, curr_chat
   )
   prompt = create_prompt(prompt_input)
+
+  print("--------------- PROMPT -----------------")
+  print(prompt)
+  print("--------------------------------")
+
   fail_safe = get_fail_safe()
   output = ChatGPT_safe_generate_structured_response(
     prompt,

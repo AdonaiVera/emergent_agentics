@@ -24,7 +24,7 @@ from .v1.action_object_v2 import run_gpt_prompt_action_game_object  # noqa: F401
 from .v1.action_location_arena_v2_cot import run_gpt_prompt_action_arena as run_gpt_prompt_action_arena_cot  # noqa: F401
 from .v1.action_location_sector_v2_cot import run_gpt_prompt_action_sector as run_gpt_prompt_action_sector_cot  # noqa: F401
 from .v1.action_object_v3_cot import run_gpt_prompt_action_game_object as run_gpt_prompt_action_game_object_cot  # noqa: F401
-from .v2.daily_planning_v6 import run_gpt_prompt_daily_plan  # noqa: F401
+from .v2.daily_planning_v7 import run_gpt_prompt_daily_plan_v7 as run_gpt_prompt_daily_plan  # noqa: F401
 from .v2.decide_to_react_v1 import run_gpt_prompt_decide_to_react  # noqa: F401
 from .v2.decide_to_talk_v2 import run_gpt_prompt_decide_to_talk  # noqa: F401
 # CoT versions of decision prompts

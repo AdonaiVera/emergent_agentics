@@ -161,6 +161,9 @@ Example:
 
    ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_os_1_whisper_50 -s 800 --ui True
 
+   ./run_backend_automatic.sh --env_name simulacra -o base_party -t party_experiment_os_1_whisper_50_ilegal -s 800 --ui True
+
+
 ```
 
 

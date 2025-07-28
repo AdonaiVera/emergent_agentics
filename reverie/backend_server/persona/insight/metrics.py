@@ -19,6 +19,7 @@ class PartyMetrics:
         
         # Adaptation metrics
         self.plan_changes = {}  # Track how often agents modify their plans
+        self.schedule_changes = {}  # Track how often agents modify their schedules
         
         # Interaction metrics
         self.interaction_density = []  # Count of interactions per time unit
@@ -105,6 +106,25 @@ class PartyMetrics:
             "old_plan": old_plan,
             "new_plan": new_plan,
             "daily_req": daily_req,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    def track_schedule_change(self, agent: str, old_schedule: List, new_schedule: List):
+        """Track when agents modify their daily schedules.
+        
+        Args:
+            agent: Name of the agent
+            old_schedule: Previous daily schedule
+            new_schedule: New daily schedule
+        """
+        if not hasattr(self, 'schedule_changes'):
+            self.schedule_changes = {}
+        if agent not in self.schedule_changes:
+            self.schedule_changes[agent] = []
+        self.schedule_changes[agent].append({
+            "step": self.current_step,
+            "old_schedule": old_schedule,
+            "new_schedule": new_schedule,
             "timestamp": datetime.now().isoformat()
         })
         
@@ -288,6 +308,9 @@ class PartyMetrics:
             "plan_changes": {
                 agent: len(changes) for agent, changes in self.plan_changes.items()
             },
+            "schedule_changes": {
+                agent: len(changes) for agent, changes in self.schedule_changes.items()
+            },
             "interaction_density": len(self.interaction_density),
             "acceptance_rejection_ratio": (
                 self.acceptance_rejection["accept"] / 
@@ -329,6 +352,7 @@ class PartyMetrics:
                 "whisper_history": self.whisper_history,
                 "interaction_counts": self.interaction_counts,
                 "plan_changes": self.plan_changes,
+                "schedule_changes": self.schedule_changes,
                 "interaction_density": self.interaction_density,
                 "acceptance_rejection": self.acceptance_rejection,
                 "zone_movements": {
