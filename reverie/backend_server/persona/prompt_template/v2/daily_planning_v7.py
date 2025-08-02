@@ -61,19 +61,18 @@ def create_prompt(prompt_input: dict[str, Any]):
     In general, {lifestyle}
     
     Today is {curr_date}. Describe {persona_name}'s plan for the party that runs from {start_party_hour}:00 PM until 5:00 AM the next morning. Include specific activities and time slots. For example:
-    - Arrive at the party at 7:00 PM
-    - Mingle with guests from 7:00 PM to 9:00 PM
-    - Have drinks and snacks from 9:00 PM to 10:00 PM
-    - Dance and socialize from 10:00 PM to 11:00 PM
-    - Continue partying until 5:00 AM
+    - Arrive at the house party at 7:00 PM
+    - Talk with people, hang out, and enjoy the music from 7:00 PM to 9:00 PM
+    - Drink margaritas, have some punch, and grab snacks from 9:00 PM to 10:00 PM
+    - Dance, sing, and have fun with friends from 10:00 PM to 11:00 PM
+    - Keep the party going, drive to the beach for fireworks, and have fun until 5:00 AM
+
 
     Party Topic: {party_topic}
 
     Carefully analyze the image and incorporate what you see into the plan. Your plan should reflect both the visual context and the personality/preferences described above.
 
-    Image Description: {image_description}
-
-    Your plan should reflect both the visual context and {persona_name}'s personality and preferences as described above. Be specific about how the image influences each part of the plan.
+    {image_description}
 
     **Important:** Include **only one activity per hour**, starting at {start_party_hour}:00 PM and ending at 5:00 AM. Make sure the plan flows naturally, considering energy levels and social context.
 
