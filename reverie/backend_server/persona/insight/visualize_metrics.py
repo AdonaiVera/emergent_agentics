@@ -1029,7 +1029,7 @@ def _analyze_whisper_sequence(whisper_history):
 if __name__ == "__main__":
     # Change manually to the path 
     base_metrics_file = "environment/frontend_server/storage/"
-    test_prefix = "crossmodality_plan_version10-s-"
+    test_prefix = "crossmodality_plan_short6-s-"
     #test_prefix = "medical_experiment_1_whisper_1-s-"    
 
     output_dir = "visualizations"

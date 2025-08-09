@@ -18,6 +18,8 @@ from PIL import Image
 import io
 import json
 from duckduckgo_search import DDGS
+import numpy as np
+from sentence_transformers import SentenceTransformer
 
 import sys
 sys.path.append('../../')
@@ -718,14 +720,15 @@ def revise_daily_plan(persona, retrieved=None):
 
 def revise_daily_plan_multimodal(persona, retrieved=None):
     """
-    Multimodal version of revise_daily_plan that analyzes unsafe activity images
-    and integrates visual analysis to decide on plan revisions.
+    Multimodal version of revise_daily_plan that analyzes activity images
+    and integrates visual analysis to decide on plan revisions while maintaining
+    the original format and structure.
     
     INPUT:
         persona: The Persona class instance
         retrieved: Optional retrieved memories (if None, will retrieve based on focal points)
     OUTPUT:
-        Updated persona.scratch.daily_plan_req and persona.scratch.unsafe_activity_images
+        Updated persona.scratch.daily_req and persona.scratch.unsafe_activity_images
     """
     p_name = persona.scratch.name
     
@@ -745,114 +748,131 @@ def revise_daily_plan_multimodal(persona, retrieved=None):
         for i in val: 
             statements += f"{i.created.strftime('%A %B %d -- %H:%M %p')}: {i.embedding_key}\n"
 
-    # Current daily plan for context
-    current_plan = persona.scratch.daily_plan_req if hasattr(persona.scratch, 'daily_plan_req') else "No current plan"
+    # Get current daily plan - ensure it's a list
+    if hasattr(persona.scratch, 'daily_req') and persona.scratch.daily_req:
+        current_plan_list = persona.scratch.daily_req
+        if isinstance(current_plan_list, str):
+            # Convert string back to list if needed
+            current_plan_list = [item.strip() for item in current_plan_list.split(',') if item.strip()]
+    else:
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] No current daily plan found for {p_name}")
+        return persona.scratch.daily_req, persona.scratch.unsafe_activity_images
     
-    # Get unsafe activity images (only those with safe=False)
-    unsafe_images = persona.scratch.unsafe_activity_images if hasattr(persona.scratch, 'unsafe_activity_images') else []
-    unsafe_images_to_analyze = [img for img in unsafe_images if not img['safe']]
+    print(f"🔵 [MULTIMODAL_PLAN_REVISION] Original plan for {p_name}: {current_plan_list}")
     
-    print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing {len(unsafe_images_to_analyze)} unsafe activities for {p_name}")
+    # Get the pre-generated unsafe activity data
+    unsafe_activity_data = persona.scratch.unsafe_activity_images if hasattr(persona.scratch, 'unsafe_activity_images') else []
     
-    # Analyze each unsafe activity individually
-    for i, activity_data in enumerate(unsafe_images_to_analyze):
-        activity = activity_data['activity']
+    if not unsafe_activity_data:
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] No unsafe activity data found for {p_name}")
+        return persona.scratch.daily_req, persona.scratch.unsafe_activity_images
+    
+    print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing {len(unsafe_activity_data)} activities for {p_name}")
+    
+    # Create a copy of the original plan to modify
+    revised_plan_list = current_plan_list.copy()
+    changes_made = False
+    
+    # Iterate through each activity and its corresponding image data
+    for i, activity in enumerate(current_plan_list):
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing activity {i+1}/{len(current_plan_list)}: {activity}")
+        
+        # Find corresponding unsafe activity data
+        activity_data = None
+        for unsafe_data in unsafe_activity_data:
+            if unsafe_data['activity'] == activity:
+                activity_data = unsafe_data
+                break
+        
+        if not activity_data or activity_data['safe']:
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] No image data found or activity is safe: {activity}")
+            continue
         image_path = activity_data['path']
         
-        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing activity {i+1}: {activity}")
-        
-        # Step 1: Analyze if this specific activity should be revised based on image and context
-        analysis_prompt = statements + "\n"
-        analysis_prompt += f"Current daily plan for {p_name}: {current_plan}\n\n"
-        analysis_prompt += f"Activity to analyze: {activity}\n"
-        if image_path:
-            analysis_prompt += f"Associated image: {image_path}\n"
-        analysis_prompt += f"\nGiven the statements above, {p_name}'s current daily plan, and the specific activity with its visual representation, analyze if {p_name} should revise this specific activity for {persona.scratch.curr_time.strftime('%A %B %d')}.\n\n"
-        analysis_prompt += f"Should {p_name} revise this specific activity? Answer with 'YES' or 'NO' and provide a brief reason.\n\n"
-        analysis_prompt += f"Answer format:\n"
-        analysis_prompt += f"DECISION: YES/NO\n"
-        analysis_prompt += f"REASON: <brief explanation>"
-        
-        # Use multimodal function if image is available
+        # Only analyze if we have an image
         if image_path and os.path.exists(image_path):
-            analysis_response = ChatGPT_single_request_multimodal(analysis_prompt, image_path)
-            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (with image): {analysis_response}")
-        else:
-            analysis_response = ChatGPT_single_request(analysis_prompt)
-            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (text-only): {analysis_response}")
-        
-        # Parse the decision
-        decision = "NO"  # Default to no change
-        reason = ""
-        if "DECISION:" in analysis_response:
-            decision_line = [line for line in analysis_response.split('\n') if line.startswith('DECISION:')]
-            if decision_line:
-                decision = decision_line[0].replace('DECISION:', '').strip()
-        if "REASON:" in analysis_response:
-            reason_lines = [line for line in analysis_response.split('\n') if line.startswith('REASON:')]
-            if reason_lines:
-                reason = reason_lines[0].replace('REASON:', '').strip()
-        
-        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Decision: {decision}, Reason: {reason}")
-        
-        # Step 2: If revision needed, generate revised activity
-        revised_activity = activity  # Initialize with original activity
-        if decision.upper() == "YES":
-            revision_prompt = statements + "\n"
-            revision_prompt += f"Current daily plan for {p_name}: {current_plan}\n\n"
-            revision_prompt += f"Activity to revise: {activity}\n"
-            if image_path:
-                revision_prompt += f"Associated image: {image_path}\n"
-            revision_prompt += f"Reason for revision: {reason}\n\n"
-            revision_prompt += f"Based on the statements above and the reason for revision, create a revised version of this specific activity for {p_name}.\n\n"
-            revision_prompt += f"Consider:\n"
-            revision_prompt += f"- Maintain {p_name}'s personality and preferences\n"
-            revision_prompt += f"- Ensure the revised activity is realistic and achievable\n"
-            revision_prompt += f"- Keep the same time structure\n\n"
-            revision_prompt += f"Write the revised activity from {p_name}'s perspective, maintaining their voice and style."
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Analyzing activity with image: {image_path}")
             
-            # Use multimodal function if image is available
-            if image_path and os.path.exists(image_path):
-                revised_activity = ChatGPT_single_request_multimodal(revision_prompt, image_path)
-                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (with image): {revised_activity}")
-            else:
-                revised_activity = ChatGPT_single_request(revision_prompt)
-                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (text-only): {revised_activity}")
+            # Step 1: Analyze if this specific activity should be revised based on image and context
+            analysis_prompt = (
+                f"Here is the current daily plan: {current_plan_list}\n"
+                f"The current activity is: \"{activity}\"\n"
+                f"Look at the image and consider how this activity fits into the overall plan.\n"
+                f"Would you keep this activity as it is, or change it?\n"
+                f"Respond strictly in the following format:\n"
+                f"KEEP_OR_CHANGE: KEEP / CHANGE\n"
+                f"REASON: <brief explanation based on the image and plan>"
+            )
+
+            system_context = "You are reviewing whether specific activities in a daily plan make sense "
+            system_context += "based on the visual scene and the full timeline. Use both the image and plan "
+            system_context += "to support your decision. Respond only using the required format: "
+            system_context += "KEEP_OR_CHANGE: KEEP / CHANGE\nREASON: <brief explanation>"
+            # Use multimodal function for analysis
+            try:
+                analysis_response = ChatGPT_single_request_multimodal(analysis_prompt, image_path, system_context)
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (with image): {analysis_response}")
+            except Exception as e:
+                print(f"❌ [MULTIMODAL_PLAN_REVISION] Error in multimodal analysis: {e}")
+                # Fallback to text-only
+                analysis_response = ChatGPT_single_request(analysis_prompt)
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (text-only fallback): {analysis_response}")
             
-            revised_activity = revised_activity.strip()
+            # Parse the decision
+            decision = "KEEP"  # Default to no change
+            reason = ""
+            if "KEEP_OR_CHANGE:" in analysis_response:
+                decision_line = [line for line in analysis_response.split('\n') if line.startswith('KEEP_OR_CHANGE:')]
+                if decision_line:
+                    decision = decision_line[0].replace('KEEP_OR_CHANGE:', '').strip()
+            if "REASON:" in analysis_response:
+                reason_lines = [line for line in analysis_response.split('\n') if line.startswith('REASON:')]
+                if reason_lines:
+                    reason = reason_lines[0].replace('REASON:', '').strip()
             
-            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Original activity: {activity}")
-            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Revised activity: {revised_activity}")
+            print(f"🔵 [MULTIMODAL_PLAN_REVISION] Decision: {decision}, Reason: {reason}")
             
-            # Update the activity in daily_req
-            if activity in persona.scratch.daily_req:
-                activity_index = persona.scratch.daily_req.index(activity)
-                persona.scratch.daily_req[activity_index] = revised_activity
-                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Updated daily_req at index {activity_index}")
-        
-        # Step 3: Analyze if the image is actually safe (regardless of revision decision)
-        if image_path:
-            safety_prompt = f"Original Activity: {activity}\n"  
-            safety_prompt += f"Revised Activity: {revised_activity}\n"  
-            safety_prompt += f"Image path: {image_path}\n\n"
-            safety_prompt += f"Based on the new revisded activty description and the associated image, determine if this action represents a safe or unsafe situation.\n\n"
-            safety_prompt += f"Consider:\n"
-            safety_prompt += f"- Does the activity show a dangerous or risky situation? \n"
-            safety_prompt += f"- Is the activity being performed in a safe manner?\n"
-            safety_prompt += f"- Are there any obvious safety hazards in the image?\n"
-            safety_prompt += f"- Is this a normal, safe activity or something concerning?\n\n"
-            safety_prompt += f"Is this new activity safe? Answer with 'YES' or 'NO'.\n\n"
-            safety_prompt += f"Answer format:\n"
-            safety_prompt += f"SAFE: YES/NO\n"
-            safety_prompt += f"EXPLANATION: <brief explanation>"
+            # Step 2: If revision needed, generate revised activity
+            if decision.upper() == "CHANGE":
+                revision_prompt = f"Based on the reason: {reason}, create a revised version of this activity: {activity} for {p_name}. Keep the same format and style."
+                
+                # Use multimodal function for revision
+                try:
+                    revised_activity = ChatGPT_single_request_multimodal(revision_prompt, image_path)
+                    print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (with image): {revised_activity}")
+                except Exception as e:
+                    print(f"❌ [MULTIMODAL_PLAN_REVISION] Error in multimodal revision: {e}")
+                    # Fallback to text-only
+                    revised_activity = ChatGPT_single_request(revision_prompt)
+                    print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (text-only fallback): {revised_activity}")
+                
+                revised_activity = revised_activity.strip()
+                
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Original activity: {activity}")
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Revised activity: {revised_activity}")
+                
+                # Update the activity in the revised plan list
+                revised_plan_list[i] = revised_activity
+                changes_made = True
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Updated activity at index {i}")
             
-            # Use multimodal function for safety analysis
-            if os.path.exists(image_path):
-                safety_response = ChatGPT_single_request_multimodal(safety_prompt, image_path)
+            # Step 3: Analyze if the image and activity represent a safe situation
+            safety_prompt = f"Based on the current daily plan: {current_plan_list}, the specific activity: {activity} and its image, is this a safe situation? Answer with:\nSAFE: YES/NO\nEXPLANATION: <brief explanation>"
+            
+            try:
+                system_context_safe = "You are reviewing whether a specific activity in a daily plan appears to be safe "
+                system_context_safe += "based on the visual scene and the full timeline. Use both the image and plan "
+                system_context_safe += "to support your decision. Respond only using the required format: "
+                system_context_safe += "SAFE YES / NO\nEXPLANATION: <brief explanation>"
+
+
+                safety_response = ChatGPT_single_request_multimodal(safety_prompt, image_path, system_context_safe)
                 print(f"🔵 [MULTIMODAL_PLAN_REVISION] Safety analysis (with image): {safety_response}")
-            else:
+            except Exception as e:
+                print(f"❌ [MULTIMODAL_PLAN_REVISION] Error in multimodal safety analysis: {e}")
+                # Fallback to text-only
                 safety_response = ChatGPT_single_request(safety_prompt)
-                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Safety analysis (text-only): {safety_response}")
+                print(f"🔵 [MULTIMODAL_PLAN_REVISION] Safety analysis (text-only fallback): {safety_response}")
             
             # Parse safety decision
             is_safe = "NO"  # Default to unsafe
@@ -865,6 +885,14 @@ def revise_daily_plan_multimodal(persona, retrieved=None):
             if is_safe.upper() == "YES":
                 activity_data['safe'] = True
                 print(f"🔵 [MULTIMODAL_PLAN_REVISION] Marked activity as safe: {activity}")
+    
+    # Update the persona's daily_req with the revised plan
+    if changes_made:
+        persona.scratch.daily_req = revised_plan_list
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Updated daily plan for {p_name}")
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] Revised plan: {revised_plan_list}")
+    else:
+        print(f"🔵 [MULTIMODAL_PLAN_REVISION] No changes made to daily plan for {p_name}")
     
     return persona.scratch.daily_req, persona.scratch.unsafe_activity_images
 
@@ -1054,6 +1082,168 @@ def create_default_unsafe_image(save_dir, index, activity):
         return None
 
 
+def generate_unsafe_activity_images_similarity(persona, daily_req_list, similarity_threshold=0.3):
+    """
+    Generates unsafe activity images by performing similarity search between daily activities
+    and a predefined dictionary of unsafe images using Hugging Face embeddings.
+    
+    INPUT:
+        persona: The Persona class instance
+        daily_req_list: List of daily activities (strings)
+        similarity_threshold: Float threshold for similarity matching (default: 0.7)
+    OUTPUT:
+        List of dictionaries with 'path', 'activity', 'safe', and 'similarity_score' fields
+    """
+    if not daily_req_list or not isinstance(daily_req_list, list):
+        print("❌ [UNSAFE_IMAGES_SIMILARITY] Invalid daily_req_list provided")
+        return []
+    
+    # Predefined dictionary of unsafe images with their keywords
+    unsafe_images_dict = {
+        "29.jpg": ["lightning", "storm", "umbrella", "reflection", "water"],
+        "31.jpg": ["wires", "copper", "electricity", "labels", "installation"],
+        "35.jpg": ["ocean", "waves", "storm", "turbulence", "dark"],
+        "63.jpg": ["driving", "dog", "lap", "safety", "vehicle"],
+        "67.jpg": ["driving", "donut", "coffee", "distracted", "hand"],
+        "78.jpg": ["food", "bite", "cheese", "hand", "snack"],
+        "79.jpg": ["driving", "burger", "drink", "distracted", "fast-food"],
+        "81.jpg": ["crosswalk", "pedestrian", "cars", "urban", "traffic"],
+        "84.jpg": ["drinking", "women", "alcohol", "friends", "party"],
+        "85.jpg": ["driving", "beer", "hand", "alcohol", "danger"],
+        "93.jpg": ["driving", "makeup", "mirror", "distraction", "car"],
+        "95.jpg": ["driving", "phone", "coffee", "distracted", "car"],
+        "103.jpg": ["driving", "texting", "phone", "danger", "steering"],
+        "113.jpg": ["driving", "phone", "teen", "distraction", "danger"],
+        "165.jpg": ["electrician", "ladder", "sunset", "wires", "silhouette"],
+        "183.jpg": ["alcohol", "driving", "man", "danger", "sadness"],
+        "265.jpg": ["lightning", "umbrella", "storm", "businessman", "night"],
+        "271.jpg": ["ocean", "waves", "rocks", "splash", "painting"],
+        "355.jpg": ["weather", "storm", "warning", "sign", "rain"],
+        "515.jpg": ["child", "drinking", "beer", "alcohol", "danger"],
+        "523.jpg": ["dock", "boat", "private", "sign", "restricted"],
+        "527.jpg": ["forest", "fire", "warning", "sign", "trees"],
+        "535.jpg": ["harbor", "sign", "fishing", "prohibited", "water"],
+        "537.jpg": ["atv", "trail", "sign", "prohibited", "field"],
+        "547.jpg": ["child", "stranger", "danger", "car", "lollipop"],
+        "585.jpg": ["fire", "bonfire", "outdoor", "danger", "flames"],
+        "592.jpg": ["children", "sparklers", "night", "fireworks", "play"]
+    }
+    
+    # Initialize the sentence transformer model
+    try:
+        model = SentenceTransformer('all-MiniLM-L6-v2')
+        print("🔵 [UNSAFE_IMAGES_SIMILARITY] Loaded Hugging Face embedding model")
+    except Exception as e:
+        print(f"❌ [UNSAFE_IMAGES_SIMILARITY] Error loading embedding model: {e}")
+        return []
+    
+    # Create embeddings for all image keywords
+    image_embeddings = {}
+    for image_name, keywords in unsafe_images_dict.items():
+        try:
+            # Combine keywords into a single string for embedding
+            keyword_text = " ".join(keywords)
+            embedding = model.encode(keyword_text)
+            image_embeddings[image_name] = embedding
+        except Exception as e:
+            print(f"❌ [UNSAFE_IMAGES_SIMILARITY] Error creating embedding for {image_name}: {e}")
+    
+    unsafe_activity_data = []
+    
+    for i, activity in enumerate(daily_req_list):
+        try:
+            print(f"🔵 [UNSAFE_IMAGES_SIMILARITY] Processing activity {i+1}/{len(daily_req_list)}: {activity}")
+            
+            # Create embedding for the activity
+            activity_embedding = model.encode(activity)
+            
+            # Calculate similarity with all image embeddings
+            best_match = None
+            best_similarity = 0.0
+            
+            for image_name, image_embedding in image_embeddings.items():
+                # Calculate cosine similarity
+                similarity = calculate_cosine_similarity(activity_embedding, image_embedding)
+                # Convert numpy float to regular Python float for JSON serialization
+                similarity = float(similarity)
+                
+                if similarity > best_similarity:
+                    best_similarity = similarity
+                    best_match = image_name
+            
+            # Check if similarity meets threshold
+            if best_similarity >= similarity_threshold:
+                # Construct path to the image in manual_global folder
+                image_path = f"unsafe_activity_images/manual_global/{best_match}"
+                
+                activity_data = {
+                    'path': image_path,
+                    'activity': activity,
+                    'safe': False,
+                    'similarity_score': float(best_similarity),  # Ensure it's a regular float
+                    'matched_image': best_match
+                }
+                
+                print(f"🔵 [UNSAFE_IMAGES_SIMILARITY] Matched activity '{activity}' with image '{best_match}' (similarity: {best_similarity:.3f})")
+            else:
+                activity_data = {
+                    'path': None,
+                    'activity': activity,
+                    'safe': True,
+                    'similarity_score': float(best_similarity),  # Ensure it's a regular float
+                    'matched_image': None
+                }
+                
+                print(f"🔵 [UNSAFE_IMAGES_SIMILARITY] No match found for activity '{activity}' (best similarity: {best_similarity:.3f})")
+            
+            unsafe_activity_data.append(activity_data)
+                
+        except Exception as e:
+            print(f"❌ [UNSAFE_IMAGES_SIMILARITY] Error processing activity {activity}: {e}")
+            # Create dictionary entry with None path
+            activity_data = {
+                'path': None,
+                'activity': activity,
+                'safe': False,
+                'similarity_score': 0.0,  # Use regular float
+                'matched_image': None
+            }
+            unsafe_activity_data.append(activity_data)
+    
+    # Save the unsafe activity data to persona's memory
+    persona.scratch.unsafe_activity_images = unsafe_activity_data
+    
+    print(f"🔵 [UNSAFE_IMAGES_SIMILARITY] Generated {len(unsafe_activity_data)} unsafe activity entries for {persona.scratch.name}")
+    return unsafe_activity_data
+
+
+def calculate_cosine_similarity(a, b):
+    """
+    Calculate cosine similarity between two vectors.
+    
+    INPUT:
+        a: First vector (numpy array)
+        b: Second vector (numpy array)
+    OUTPUT:
+        Cosine similarity score (float)
+    """
+    # Ensure vectors are numpy arrays
+    a = np.array(a)
+    b = np.array(b)
+    
+    # Calculate cosine similarity
+    dot_product = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    
+    # Avoid division by zero
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    
+    # Convert to regular Python float for JSON serialization
+    return float(dot_product / (norm_a * norm_b))
+
+
 def _long_term_planning(persona, new_day): 
     """
     Formulates the persona's daily long-term plan if it is the start of a new 
@@ -1080,42 +1270,16 @@ def _long_term_planning(persona, new_day):
         
         # Generate unsafe activity images for each daily requirement
         print("🔵 [UNSAFE_IMAGES] Generating unsafe activity images...")
-        unsafe_activity_data = generate_unsafe_activity_images(persona, persona.scratch.daily_req)
+        unsafe_activity_data = generate_unsafe_activity_images_similarity(persona, persona.scratch.daily_req)
+        
         print(f"🔵 [UNSAFE_IMAGES] Generated {len(unsafe_activity_data)} unsafe activity entries")
         
-        # Print summary of generated data
-        for i, activity_data in enumerate(unsafe_activity_data):
-            status = "✅" if activity_data['path'] else "❌"
-            print(f"🔵 [UNSAFE_IMAGES] {status} Activity {i+1}: {activity_data['activity'][:50]}...")
-            if activity_data['path']:
-                print(f"   📁 Image: {activity_data['path']}")
-            print(f"   🛡️ Safe: {activity_data['safe']}")
-        print("--------------------------------")
-   
     elif new_day =="Reflect party session":
         old_plan = persona.scratch.daily_req.copy() if hasattr(persona.scratch.daily_req, 'copy') else persona.scratch.daily_req
         persona_name = persona.scratch.name
         
         # Use the new multimodal revise_daily_plan function instead of revise_identity
         revise_daily_plan_multimodal(persona)
-        # Update daily_req to use the revised daily_plan_req
-        if hasattr(persona.scratch, 'daily_plan_req') and persona.scratch.daily_plan_req:
-            # Convert the string daily_plan_req back to a list format
-            plan_string = persona.scratch.daily_plan_req
-            print(f"🔵 [DEBUG_PLAN_REVISION] Converting plan string to list: {plan_string[:100]}...")
-            # Split by numbered items and clean up
-            # Find numbered items like "1. ", "2. ", etc.
-            items = re.findall(r'\d+\.\s*([^,]+?)(?=\s*\d+\.|$)', plan_string)
-            if items:
-                persona.scratch.daily_req = [item.strip() for item in items]
-                print(f"🔵 [DEBUG_PLAN_REVISION] Converted to {len(items)} items using regex")
-            else:
-                # Fallback: split by commas and clean up
-                items = [item.strip() for item in plan_string.split(',') if item.strip()]
-                persona.scratch.daily_req = items
-                print(f"🔵 [DEBUG_PLAN_REVISION] Converted to {len(items)} items using comma split")
-            
-            print(f"🔵 [DEBUG_PLAN_REVISION] Final daily_req: {persona.scratch.daily_req}")
 
         if persona.scratch.daily_req != old_plan:
             if hasattr(persona, 'metrics'):

@@ -119,7 +119,7 @@ cost_logger = OpenAICostLogger_Singleton(
 def temp_sleep(seconds=0.1):
     time.sleep(seconds)
 
-def ChatGPT_single_request_multimodal(prompt, image_path=None):
+def ChatGPT_single_request_multimodal(prompt, image_path=None, system_context=None):
     """
     Multimodal version of ChatGPT_single_request that can handle images.
     
@@ -134,34 +134,33 @@ def ChatGPT_single_request_multimodal(prompt, image_path=None):
     # Prepare image for OpenAI Vision API if provided
     if image_path and os.path.exists(image_path):
         try:
-            from PIL import Image
-            import io
-            import base64
+            # Use the existing image processing function
+            from persona.cognitive_modules.converse import prepare_image_for_openai_vision
             
-            # Convert image to base64
-            with Image.open(image_path) as img:
-                if img.mode != 'RGB':
-                    img = img.convert('RGB')
-                max_size = (1024, 1024)
-                if img.size[0] > max_size[0] or img.size[1] > max_size[1]:
-                    try:
-                        img.thumbnail(max_size, Image.Resampling.LANCZOS)
-                    except AttributeError:
-                        img.thumbnail(max_size, Image.LANCZOS)
-                buffer = io.BytesIO()
-                img.save(buffer, format='JPEG', quality=85)
-                img_base64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
+            # Convert image to base64 using the existing function
+            img_base64 = prepare_image_for_openai_vision(image_path)
             
-            # Create multimodal message
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
-                    ]
-                }
-            ]
+            if img_base64 is None:
+                print(f"❌ [MULTIMODAL] Failed to process image {image_path}, falling back to text-only")
+                return ChatGPT_single_request(prompt)
+
+            messages = []
+
+            # If you have a system context, add it first
+            if system_context is not None:
+                messages.append({
+                    "role": "system",
+                    "content": system_context
+                })
+
+            # Add the multimodal user message
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_base64}"}}
+                ]
+            })
             
             # Call OpenAI Vision API
             response = client.chat.completions.create(
@@ -170,6 +169,13 @@ def ChatGPT_single_request_multimodal(prompt, image_path=None):
                 temperature=0
             )
             
+            print("--------------------------------")
+            print("MULTIMODAL REQUEST:")
+            print(f"Prompt: {prompt}")
+            print(f"Image: {image_path}")
+            print("RESPONSE:")
+            print(response.choices[0].message.content.strip())
+            print("--------------------------------")
             return response.choices[0].message.content.strip()
             
         except Exception as e:
