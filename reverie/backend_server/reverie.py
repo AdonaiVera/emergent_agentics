@@ -59,9 +59,13 @@ logfile_name = "log.txt"
 class ReverieServer: 
     def __init__(self, 
                  fork_sim_code,
-                 sim_code):
+                 sim_code,
+                 scenario_index=0):
         
         print ("(reverie): Temp storage: ", fs_temp_storage)
+        
+        # Store scenario index for party situations
+        self.scenario_index = scenario_index
             
         # FORKING FROM A PRIOR SIMULATION:
         # <fork_sim_code> indicates the simulation we are forking from. 
@@ -498,6 +502,11 @@ class ReverieServer:
         max_consecutive_failures = 10
         consecutive_failures = 0
 
+        # Use the scenario index passed to the constructor
+        scenario_index = self.scenario_index
+
+        print(f"🔵 [REVERIE] Starting server for scenario {scenario_index}")
+
         # The main while loop of Reverie. 
         while (True): 
           
@@ -777,6 +786,7 @@ class ReverieServer:
                             self.personas_tile[persona_name],
                             self.curr_time,
                             self.step,
+                            scenario_index
                         )
                                                 
                         movements["persona"][persona_name] = {}

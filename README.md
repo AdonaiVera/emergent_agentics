@@ -165,8 +165,13 @@ Example:
 
 
    # With past experiences
-   /run_backend_automatic.sh --env_name simulacra -o base_party -t crossmodality_plan_short7 -s 60 --ui True
+   ./run_backend_automatic.sh --env_name simulacra -o base_party -t crossmodality_plan_short7 -s 60 --ui True
 
+   ./run_backend_automatic.sh --env_name simulacra -o base_party_memory -t new_crossmodality_0 -s 2400 --ui True
+
+   ./run_backend_automatic.sh --env_name simulacra -o base_party -t new_crossmodality_0 -s 600 --ui True --scenario_index 5
+
+   # 1800 + 600
 ```
 
 

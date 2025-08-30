@@ -47,6 +47,10 @@ while [[ $# -gt 0 ]]; do
             ARGS="${ARGS} --steps ${2}"
             shift 2
             ;;
+        --scenario_index|-si)
+            ARGS="${ARGS} --scenario_index ${2}"
+            shift 2
+            ;;
         --ui)
             ARGS="${ARGS} --ui ${2}"
             shift 2

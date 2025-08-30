@@ -21,10 +21,15 @@ test.py
 cost-logs/
 tools/temp_test_persona
 reverie/backend_server/tools
+reverie/backend_server/logs/
+reverie/backend_server/plan_scene_images/
+safety_analysis_output/
 
 # Ignore dataset
 reverie/backend_server/mssbench/
 reverie/backend_server/unsafe_activity_images/
+reverie/backend_server/unsafe_plans/unsafe_party_situations_good2_final.json
+reverie/backend_server/unsafe_plans/unsafe_party_situations_with_images.json
 
 # Ignore figures
 cross_modal_consistency_good_one.png

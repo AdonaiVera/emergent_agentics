@@ -17,15 +17,19 @@ from multiprocessing import Process
 from openai_cost_logger import OpenAICostLoggerViz
 
 
-def parse_args() -> Tuple[str, str, int, Union[bool, None], str, str, str]:
+def parse_args() -> Tuple[str, str, int, Union[bool, None], str, str, str, int]:
     """Parse bash arguments
 
     Returns:
-        Tuple[str, str, int, bool]:
+        Tuple[str, str, int, bool, str, str, str, int]:
             - name of the forked simulation
             - the name of the new simulation
             - total steps to run (step = 10sec in the simulation)
             - open the simulator UI
+            - browser path
+            - port number
+            - history file
+            - scenario index
     """
     parser = argparse.ArgumentParser(description='Reverie Server')
     parser.add_argument(
@@ -71,6 +75,12 @@ def parse_args() -> Tuple[str, str, int, Union[bool, None], str, str, str]:
         required=False,
         help='Load agent history file'
     )
+    parser.add_argument(
+        '--scenario_index',
+        type=int,
+        default=0,
+        help='Scenario index for party situations (default: 0)'
+    )
     origin = parser.parse_args().origin
     target = parser.parse_args().target
     steps = parser.parse_args().steps
@@ -79,8 +89,9 @@ def parse_args() -> Tuple[str, str, int, Union[bool, None], str, str, str]:
     browser_path = parser.parse_args().browser_path
     port = parser.parse_args().port
     history_file = parser.parse_args().load_history
+    scenario_index = parser.parse_args().scenario_index
     
-    return origin, target, steps, ui, browser_path, port, history_file
+    return origin, target, steps, ui, browser_path, port, history_file, scenario_index
 
 
 def get_starting_step(exp_name: str) -> int:
@@ -186,12 +197,12 @@ def load_agent_history(rs, history_file: str) -> None:
 
 
 if __name__ == '__main__':
-    checkpoint_freq = 200 # 1 step = 10 sec
+    checkpoint_freq = 700 # 1 step = 10 sec
     max_stepbacks = 5
     curr_stepbacks = 0
     log_path = "cost-logs" # where the simulations' prints are stored
     idx = 0
-    origin, target, tot_steps, ui, browser_path, port, history_file = parse_args()
+    origin, target, tot_steps, ui, browser_path, port, history_file, scenario_index = parse_args()
     current_step = get_starting_step(origin)
     exp_name = target
     start_time = datetime.now()
@@ -210,7 +221,7 @@ if __name__ == '__main__':
             target = f"{exp_name}-s-{idx}-{current_step}-{curr_checkpoint}"
             print(f"(Auto-Exec): STAGE {idx}", flush=True)
             print(f"(Auto-Exec): Running experiment '{exp_name}' from step '{current_step}' to '{curr_checkpoint}'", flush=True)
-            rs = reverie.ReverieServer(origin, target)
+            rs = reverie.ReverieServer(origin, target, scenario_index=scenario_index)
 
             # Load agent history if provided
             if history_file and current_step == 0:
