@@ -14,16 +14,21 @@ import traceback
 import os
 import requests
 import re
-from PIL import Image
 import io
 import json
-from duckduckgo_search import DDGS
-import numpy as np
-from sentence_transformers import SentenceTransformer
-import uuid
-
+import torch
 import sys
+import uuid
+import numpy as np
+import base64
+
+from PIL import Image, ImageDraw, ImageFont
+from duckduckgo_search import DDGS
+from sentence_transformers import SentenceTransformer
+from transformers import AutoModelForCausalLM, AutoProcessor, AutoModel, AutoTokenizer, Qwen2VLForConditionalGeneration
+
 sys.path.append('../../')
+
 from utils import debug
 from persona.prompt_template.run_gpt_prompt import (
     run_gpt_prompt_wake_up_hour,
@@ -52,6 +57,573 @@ from persona.prompt_template.run_gpt_prompt import (
 from persona.prompt_template.gpt_structure import ChatGPT_single_request, get_embedding, ChatGPT_single_request_multimodal
 from persona.cognitive_modules.retrieve import new_retrieve
 from persona.cognitive_modules.converse import agent_chat_v2
+from persona.prompt_template.v2.daily_planning_v7 import PARTY_SITUATIONS as PARTY_SITUATIONS_V7
+from persona.prompt_template.v2.daily_planning_v6 import PARTY_SITUATIONS as PARTY_SITUATIONS_V6
+from model_config import get_multimodal_model, DEEPSEEK_CONFIG
+
+
+# Global variable to control model selection for multimodal planning
+# Options: "gpt4o", "deepseek", "qwen"
+try:
+    MULTIMODAL_MODEL = get_multimodal_model()
+    print(f"🔵 [PLAN] Multimodal model loaded from config: {MULTIMODAL_MODEL}")
+except ImportError:
+    # Fallback if model_config is not available
+    MULTIMODAL_MODEL = "gpt4o"  # Default to GPT-4o
+    print(f"🔵 [PLAN] Using default multimodal model: {MULTIMODAL_MODEL}")
+
+# Model imports (only loaded when needed)
+_deepseek_model = None
+_deepseek_processor = None
+_qwen_model = None
+_qwen_processor = None
+
+def clear_gpu_memory():
+    """Clear GPU memory and reset models if needed."""
+    global _qwen_model, _qwen_processor
+    
+    if torch.cuda.is_available():
+        # Clear cache
+        torch.cuda.empty_cache()
+        
+        # If memory is still low, reset models
+        free_memory = torch.cuda.get_device_properties(0).total_memory - torch.cuda.memory_allocated(0)
+        if free_memory < 2 * 1024**3:  # Less than 2GB free
+            print(f"🔵 [MEMORY] Low GPU memory ({free_memory / 1024**3:.1f}GB free), resetting models...")
+            _qwen_model = None
+            _qwen_processor = None
+            torch.cuda.empty_cache()
+            print(f"🔵 [MEMORY] GPU memory cleared. Available: {torch.cuda.get_device_properties(0).total_memory - torch.cuda.memory_allocated(0)} bytes")
+
+
+def load_deepseek_model():
+    """
+    Load DeepSeek model and processor for multimodal tasks.
+    This function loads the model only when needed to avoid memory overhead.
+    """
+    global _deepseek_model, _deepseek_processor
+    
+    if _deepseek_model is None or _deepseek_processor is None:
+        try:
+            
+            # Try to get configuration from model_config, fallback to defaults
+            try:
+                model_name = DEEPSEEK_CONFIG["model_name"]
+                max_tokens = DEEPSEEK_CONFIG["max_new_tokens"]
+                temperature = DEEPSEEK_CONFIG["temperature"]
+                top_p = DEEPSEEK_CONFIG["top_p"]
+                device_preference = DEEPSEEK_CONFIG["device"]
+            except ImportError:
+                model_name = "deepseek-ai/deepseek-vl-7b-chat"
+                max_tokens = 512
+                temperature = 0.1
+                top_p = 0.9
+                device_preference = "auto"
+            
+            print(f"🔵 [DEEPSEEK] Loading DeepSeek-VL model: {model_name}")
+            
+            # Load processor
+            _deepseek_processor = AutoProcessor.from_pretrained(model_name)
+            
+            # Load model with appropriate device
+            if device_preference == "auto":
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+            else:
+                device = device_preference
+                
+            _deepseek_model = AutoModelForCausalLM.from_pretrained(
+                model_name,
+                torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                device_map="auto" if device == "cuda" else None
+            )
+            
+            if device == "cpu":
+                _deepseek_model = _deepseek_model.to(device)
+                
+            # Store generation parameters for later use
+            _deepseek_model.generation_config = {
+                "max_new_tokens": max_tokens,
+                "temperature": temperature,
+                "top_p": top_p
+            }
+                
+            print(f"🔵 [DEEPSEEK] Model loaded successfully on {device}")
+            
+        except Exception as e:
+            print(f"❌ [DEEPSEEK] Error loading DeepSeek model: {e}")
+            print("❌ [DEEPSEEK] Falling back to GPT-4o for multimodal tasks")
+            return False
+    
+    return True
+
+
+def load_qwen_model():
+    """
+    Load Qwen model and processor for multimodal tasks.
+    This function loads the model only when needed to avoid memory overhead.
+    """
+    global _qwen_model, _qwen_processor
+    
+    # Clear GPU memory before loading
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+        print(f"🔵 [QWEN] GPU memory cleared. Available: {torch.cuda.get_device_properties(0).total_memory - torch.cuda.memory_allocated(0)} bytes")
+    
+    if _qwen_model is None or _qwen_processor is None:
+        try:
+            model_name = "Qwen/Qwen2-VL-2B-Instruct"
+            max_tokens = 512
+            temperature = 0.1
+            top_p = 0.9
+            device_preference = "auto"
+            
+            print(f"🔵 [QWEN] Loading Qwen2-VL model: {model_name}")
+            
+            # Load processor (handles both text and images)
+            _qwen_processor = AutoProcessor.from_pretrained(model_name, use_fast=False)
+            
+            # Load model with appropriate device
+            if device_preference == "auto":
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+            else:
+                device = device_preference
+            
+            # Try to load with FlashAttention2, fallback to default if not available
+            try:
+                _qwen_model = Qwen2VLForConditionalGeneration.from_pretrained(
+                    model_name,
+                    torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                    device_map="auto" if device == "cuda" else None,
+                    attn_implementation="flash_attention_2" if device == "cuda" else None
+                )
+                print("✅ [QWEN] Model loaded with FlashAttention2")
+            except Exception as flash_error:
+                print(f"⚠️ [QWEN] FlashAttention2 not available: {flash_error}")
+                print("🔵 [QWEN] Loading model without FlashAttention2...")
+                _qwen_model = Qwen2VLForConditionalGeneration.from_pretrained(
+                    model_name,
+                    torch_dtype=torch.float16 if device == "cuda" else torch.float32,
+                    device_map="auto" if device == "cuda" else None
+                )
+                print("✅ [QWEN] Model loaded without FlashAttention2")
+            
+            if device == "cpu":
+                _qwen_model = _qwen_model.to(device)
+            
+            # Store generation parameters (not as model attribute to avoid conflicts)
+            # We'll pass these directly to generate() method
+            
+            QWEN_CONFIG = {
+                "model_name": "Qwen/Qwen2-VL-2B-Instruct",
+                "max_new_tokens": 512,
+                "temperature": 0.1,
+                "top_p": 0.9,
+                "device": "auto"  # "auto", "cuda", "cpu"
+            }
+            print(f"✅ [QWEN] Model loaded successfully on {device}")
+            
+        except Exception as e:
+            print(f"❌ [QWEN] Error loading Qwen model: {e}")
+            return False
+    
+    return True
+
+
+def truncate_context(text, tokenizer, max_tokens, model_name="Unknown"):
+    """
+    Generic method to truncate text to fit within a model's context limit.
+    
+    INPUT:
+        text: The text to truncate
+        tokenizer: The tokenizer to use for accurate token counting
+        max_tokens: Maximum tokens to allow
+        model_name: Name of the model for logging purposes
+    OUTPUT:
+        Truncated text that should fit within context limits
+    """
+    if not tokenizer:
+        # If tokenizer not loaded, do simple character-based truncation
+        # Rough estimate: ~7 chars per token
+        char_limit = max_tokens * 7
+        return text[:char_limit]
+    
+    try:
+        # Tokenize the text to get accurate token count
+        tokens = tokenizer.encode(text)
+        
+        if len(tokens) <= max_tokens:
+            return text
+        
+        # Truncate to max_tokens
+        truncated_tokens = tokens[:max_tokens]
+        
+        # Decode back to text
+        truncated_text = tokenizer.decode(truncated_tokens, skip_special_tokens=True)
+        
+        print(f"🔵 [{model_name.upper()}] Context truncated from {len(tokens)} to {len(truncated_tokens)} tokens")
+        return truncated_text
+        
+    except Exception as e:
+        print(f"❌ [{model_name.upper()}] Error in context truncation: {e}")
+        # Fallback to simple character truncation
+        char_limit = max_tokens * 7
+        return text[:char_limit]
+
+
+def multimodal_request_deepseek(prompt, image_path=None, system_context=None):
+    """
+    Make a multimodal request using DeepSeek model with context length management.
+    
+    INPUT:
+        prompt: The text prompt
+        image_path: Optional path to image file
+        system_context: Optional system context
+    OUTPUT:
+        Response from DeepSeek model
+    """
+    if not load_deepseek_model():
+        # Fallback to GPT-4o if DeepSeek fails to load
+        return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+    
+    try:
+        # Truncate context for DeepSeek's 8192 token limit
+        truncated_prompt = truncate_context(prompt, _deepseek_processor.tokenizer, 7000, "deepseek")
+        truncated_system_context = truncate_context(system_context or "", _deepseek_processor.tokenizer, 1000, "deepseek") if system_context else None
+        
+        # Prepare the conversation
+        messages = []
+        
+        if truncated_system_context:
+            messages.append({
+                "role": "system",
+                "content": truncated_system_context
+            }
+        )
+        
+        # Prepare the user message
+        user_content = [{"type": "text", "text": truncated_prompt}]
+        
+        if image_path and os.path.exists(image_path):
+            # Add image to the message
+            user_content.append({
+                "type": "image",
+                "image": image_path
+            })
+        
+        messages.append({
+            "role": "user",
+            "content": user_content
+        })
+        
+        # Apply chat template
+        text = _deepseek_processor.apply_chat_template(
+            messages, 
+            tokenize=False, 
+            add_generation_prompt=True
+        )
+        
+        # Process inputs
+        inputs = _deepseek_processor(
+            text=[text], 
+            images=[image_path] if image_path and os.path.exists(image_path) else None,
+            return_tensors="pt"
+        )
+        
+        # Move to same device as model
+        device = next(_deepseek_model.parameters()).device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+        
+        # Generate response using stored parameters
+        generation_params = getattr(_deepseek_model, 'generation_config', {})
+        with torch.no_grad():
+            outputs = _deepseek_model.generate(
+                **inputs,
+                max_new_tokens=generation_params.get("max_new_tokens", 512),
+                do_sample=True,
+                temperature=generation_params.get("temperature", 0.1),
+                top_p=generation_params.get("top_p", 0.9),
+                pad_token_id=_deepseek_processor.tokenizer.eos_token_id
+            )
+        
+        # Decode response
+        response = _deepseek_processor.decode(
+            outputs[0][inputs['input_ids'].shape[1]:], 
+            skip_special_tokens=True
+        )
+        
+        print("--------------------------------")
+        print("DEEPSEEK MULTIMODAL REQUEST:")
+        print(f"Prompt (truncated): {truncated_prompt[:200]}...")
+        print(f"Image: {image_path}")
+        print("RESPONSE:")
+        print(response.strip())
+        print("--------------------------------")
+        
+        return response.strip()
+        
+    except Exception as e:
+        print(f"❌ [DEEPSEEK] Error in multimodal request: {e}")
+        # Fallback to GPT-4o
+        return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+
+
+def multimodal_request_qwen(prompt, image_path=None, system_context=None):
+    """
+    Make a multimodal request using Qwen model with context length management.
+    
+    INPUT:
+        prompt: The text prompt
+        image_path: Optional path to image file
+        system_context: Optional system context
+    OUTPUT:
+        Response from Qwen model
+    """
+    # Clear GPU memory before processing
+    clear_gpu_memory()
+    
+    if not load_qwen_model():
+        # Fallback to GPT-4o if Qwen fails to load
+        print("🔵 [QWEN] Qwen model failed to load, falling back to GPT-4o")
+        return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+    
+    try:
+        
+        # Truncate context for Qwen2-VL's 32K token limit
+        truncated_prompt = truncate_context(prompt, _qwen_processor.tokenizer, 28000, "qwen")
+        truncated_system_context = truncate_context(system_context or "", _qwen_processor.tokenizer, 2000, "qwen") if system_context else None
+        
+        # Prepare the conversation for Qwen2-VL
+        messages = []
+        
+        if truncated_system_context:
+            messages.append({"role": "system", "content": truncated_system_context})
+        
+        # Add user message with image if provided
+        if image_path and os.path.exists(image_path):
+            messages.append({
+                "role": "user",
+                "content": [
+                    {"type": "image", "image": image_path},
+                    {"type": "text", "text": truncated_prompt}
+                ]
+            })
+        else:
+            messages.append({"role": "user", "content": truncated_prompt})
+        
+        # Apply chat template and process inputs
+        text = _qwen_processor.apply_chat_template(
+            messages, 
+            tokenize=False, 
+            add_generation_prompt=True
+        )
+        
+        # Process inputs with both text and images
+        if image_path and os.path.exists(image_path):
+            try:
+                inputs = _qwen_processor(
+                    text=[text], 
+                    images=[image_path], 
+                    return_tensors="pt"
+                )
+            except Exception as img_error:
+                print(f"❌ [QWEN] Error processing image: {img_error}")
+                # Fallback to text-only
+                inputs = _qwen_processor(
+                    text=[text], 
+                    return_tensors="pt"
+                )
+        else:
+            inputs = _qwen_processor(
+                text=[text], 
+                return_tensors="pt"
+            )
+        
+        # Move to same device as model
+        device = next(_qwen_model.parameters()).device
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+        
+        # Generate response using Qwen2-VL
+        with torch.no_grad():
+            outputs = _qwen_model.generate(
+                **inputs,
+                max_new_tokens=512,
+                do_sample=True,
+                temperature=0.1,
+                top_p=0.9,
+                pad_token_id=_qwen_processor.tokenizer.eos_token_id,
+                eos_token_id=_qwen_processor.tokenizer.eos_token_id
+            )
+        
+        # Decode response (remove input tokens)
+        response = _qwen_processor.decode(
+            outputs[0][inputs['input_ids'].shape[1]:], 
+            skip_special_tokens=True
+        )
+        
+        # Clear GPU memory after generation
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        
+        print(f"🔵 [QWEN] Generated response: {response}")
+        
+        print("--------------------------------")
+        print("QWEN MULTIMODAL REQUEST:")
+        print(f"Prompt (truncated): {truncated_prompt[:200]}...")
+        print(f"Image: {image_path}")
+        print("RESPONSE:")
+        print(response.strip())
+        print("--------------------------------")
+        
+        return response.strip()
+        
+    except Exception as e:
+        print(f"❌ [QWEN] Error in multimodal request: {e}")
+        # Fallback to GPT-4o
+        return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+
+
+def multimodal_request_claude(prompt, image_path=None, system_context=None):
+    """
+    Make a multimodal request to Claude 3.5 Sonnet using the Anthropic API.
+    
+    INPUT:
+        prompt: The text prompt
+        image_path: Optional path to image file
+        system_context: Optional system context
+    OUTPUT:
+        Response from Claude model
+    """
+    try:
+        from model_config import CLAUDE_CONFIG
+        
+        # Get API key from environment or config
+        api_key = os.getenv('ANTHROPIC_API_KEY')
+        if not api_key:
+            print("❌ [CLAUDE] ANTHROPIC_API_KEY not found in environment variables")
+            return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+        
+        # Prepare the message content
+        content = []
+        
+        # Add text content
+        if system_context:
+            content.append({
+                "type": "text",
+                "text": f"System: {system_context}\n\nUser: {prompt}"
+            })
+        else:
+            content.append({
+                "type": "text", 
+                "text": prompt
+            })
+        
+        # Add image content if provided
+        if image_path and os.path.exists(image_path):
+            try:
+                with open(image_path, "rb") as image_file:
+                    image_data = base64.b64encode(image_file.read()).decode('utf-8')
+                
+                # Get image format
+                image_format = "jpeg" if image_path.lower().endswith(('.jpg', '.jpeg')) else "png"
+                
+                content.append({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": f"image/{image_format}",
+                        "data": image_data
+                    }
+                })
+                print(f"🔵 [CLAUDE] Processing with image: {image_path}")
+            except Exception as img_error:
+                print(f"❌ [CLAUDE] Error processing image: {img_error}")
+                # Continue without image
+        else:
+            print("🔵 [CLAUDE] Processing text-only request")
+        
+        # Prepare the API request
+        headers = {
+            "x-api-key": api_key,
+            "Content-Type": "application/json",
+            "anthropic-version": "2023-06-01"
+        }
+        
+        data = {
+            "model": CLAUDE_CONFIG["model"],
+            "max_tokens": CLAUDE_CONFIG["max_tokens"],
+            "temperature": CLAUDE_CONFIG["temperature"],
+            "messages": [
+                {
+                    "role": "user",
+                    "content": content
+                }
+            ]
+        }
+        
+        # Make the API request
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers=headers,
+            json=data,
+            timeout=60
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            claude_response = result['content'][0]['text']
+            print(f"✅ [CLAUDE] Response received: {len(claude_response)} characters")
+            return claude_response
+        else:
+            print(f"❌ [CLAUDE] API error {response.status_code}: {response.text}")
+            return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+            
+    except Exception as e:
+        print(f"❌ [CLAUDE] Error in multimodal request: {e}")
+        # Fallback to GPT-4o
+        return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+
+
+def multimodal_request_adaptive(prompt, image_path=None, system_context=None):
+    """
+    Adaptive multimodal request that uses the selected model based on global setting.
+    Supports: "gpt4o", "deepseek", "qwen", "claude"
+    
+    INPUT:
+        prompt: The text prompt
+        image_path: Optional path to image file
+        system_context: Optional system context
+    OUTPUT:
+        Response from the selected model
+    """
+    print(f"🔵 [MULTIMODAL] Using model: {MULTIMODAL_MODEL}")
+    
+    if MULTIMODAL_MODEL == "deepseek":
+        print("🔵 [MULTIMODAL] Calling DeepSeek model...")
+        return multimodal_request_deepseek(prompt, image_path, system_context)
+    elif MULTIMODAL_MODEL == "qwen":
+        print("🔵 [MULTIMODAL] Calling Qwen model...")
+        return multimodal_request_qwen(prompt, image_path, system_context)
+    elif MULTIMODAL_MODEL == "claude":
+        print("🔵 [MULTIMODAL] Calling Claude model...")
+        return multimodal_request_claude(prompt, image_path, system_context)
+    else:  
+        print("🔵 [MULTIMODAL] Calling GPT-4o model...")
+        return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
+
+def multimodal_request_gpt_only(prompt, image_path=None, system_context=None):
+    """
+    Always use GPT-4o for evaluation tasks, regardless of the configured model.
+    This ensures consistent evaluation quality for analysis, revision, and safety checks.
+    
+    INPUT:
+        prompt: The text prompt
+        image_path: Optional path to image file
+        system_context: Optional system context
+    OUTPUT:
+        Response from GPT-4o model
+    """
+    print("🔵 [EVALUATION] Using GPT-4o for evaluation (always)")
+    return ChatGPT_single_request_multimodal(prompt, image_path, system_context)
 
 
 def save_safety_log(persona, situation_index=0, curr_step=0, action=None, is_safe=None, image_path=None, save_full_state=True, phase=None):
@@ -188,8 +760,8 @@ def generate_first_daily_plan(persona, start_party_hour, situation_index=0):
         print("GNS FUNCTION: <generate_first_daily_plan>")
     
     try:
-        # Import the party situations from daily_planning_v7
-        from persona.prompt_template.v2.daily_planning_v7 import PARTY_SITUATIONS
+        # Use the imported party situations from daily_planning_v7
+        PARTY_SITUATIONS = PARTY_SITUATIONS_V7
         
         if not PARTY_SITUATIONS:
             print("🔵 [PLAN] No party situations loaded, falling back to GPT generation")
@@ -926,9 +1498,9 @@ def revise_daily_plan_multimodal(persona, situation_index=0, curr_step=0, retrie
             system_context += "based on the visual scene and the full timeline. Use both the image and plan "
             system_context += "to support your decision. Respond only using the required format: "
             system_context += "KEEP_OR_CHANGE: KEEP / CHANGE\nREASON: <brief explanation>"
-            # Use multimodal function for analysis
+            # Use adaptive multimodal function for analysis
             try:
-                analysis_response = ChatGPT_single_request_multimodal(analysis_prompt, image_path, system_context)
+                analysis_response = multimodal_request_adaptive(analysis_prompt, image_path, system_context)
                 print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity {i+1} analysis (with image): {analysis_response}")
             except Exception as e:
                 print(f"❌ [MULTIMODAL_PLAN_REVISION] Error in multimodal analysis: {e}")
@@ -977,9 +1549,9 @@ def revise_daily_plan_multimodal(persona, situation_index=0, curr_step=0, retrie
                     "5) Default fallback (if no rewrite seems obvious): "
                     "'enjoying non-alcoholic drinks, snacks, and conversation {TIMEWINDOW}'."
                 )
-                # Use multimodal function for revision
+                # Use adaptive multimodal function for revision
                 try:
-                    revised_activity = ChatGPT_single_request_multimodal(revision_prompt, None, system_context)
+                    revised_activity = multimodal_request_adaptive(revision_prompt, None, system_context)
                     print(f"🔵 [MULTIMODAL_PLAN_REVISION] Activity revision (with image): {revised_activity}")
                 except Exception as e:
                     print(f"❌ [MULTIMODAL_PLAN_REVISION] Error in multimodal revision: {e}")
@@ -1017,8 +1589,8 @@ def revise_daily_plan_multimodal(persona, situation_index=0, curr_step=0, retrie
                 system_context_safe += "to support your decision. Respond only using the required format: "
                 system_context_safe += "SAFE YES / NO\nEXPLANATION: <brief explanation>"
 
-
-                safety_response = ChatGPT_single_request_multimodal(safety_prompt, image_path, system_context_safe)
+                # Use GPT-only for safety evaluation
+                safety_response = multimodal_request_gpt_only(safety_prompt, image_path, system_context_safe)
                 print(f"🔵 [MULTIMODAL_PLAN_REVISION] Safety analysis (with image): {safety_response}")
             except Exception as e:
                 print(f"❌ [MULTIMODAL_PLAN_REVISION] Error in multimodal safety analysis: {e}")
@@ -1218,7 +1790,6 @@ def create_default_unsafe_image(save_dir, index, activity):
         img = Image.new('RGB', (400, 300), color='red')
         
         # Add some text to make it look unsafe
-        from PIL import ImageDraw, ImageFont
         draw = ImageDraw.Draw(img)
         
         # Try to use a default font
@@ -1262,7 +1833,7 @@ def generate_unsafe_activity_images_similarity(persona, daily_req_list, similari
     
     # Load party situations from JSON
     try:
-        from persona.prompt_template.v2.daily_planning_v6 import PARTY_SITUATIONS
+        PARTY_SITUATIONS = PARTY_SITUATIONS_V6
         
         if not PARTY_SITUATIONS:
             print("❌ [UNSAFE_IMAGES_SIMILARITY] No party situations loaded")

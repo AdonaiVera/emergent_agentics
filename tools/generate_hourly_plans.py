@@ -238,7 +238,7 @@ def load_situations():
 
 def save_situations_with_plans(situations):
     """Save the situations with their generated plans back to the JSON file."""
-    json_path = os.path.join(os.path.dirname(__file__), "description": "On the beach, a bonfire blazes as friends gather around, sharing stories under the stars, with the sound of waves crashing nearby. The atmosphere is electric; someone pulls out a guitar while others dance barefoot in the sand, the heat of the fire radiating against the cool ocean breeze. As the night heats up, they decide to go for a swim, but quickly turn it into a race to see who can swim the farthest out into the ocean. With laughter and cheers, they dive in and swim into the depths, far from the shore, pushing their limits as the moonlight glistens on the water.",'../reverie/backend_server/unsafe_plans/unsafe_party_situations.json')
+    json_path = os.path.join(os.path.dirname(__file__), '../reverie/backend_server/unsafe_plans/unsafe_party_situations.json')
     
     with open(json_path, 'w') as f:
         json.dump(situations, f, indent=2)
