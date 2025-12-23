@@ -24,6 +24,7 @@ reverie/backend_server/tools
 reverie/backend_server/logs/
 reverie/backend_server/plan_scene_images/
 safety_analysis_output/
+plots_avg/
 
 # Ignore dataset
 reverie/backend_server/mssbench/

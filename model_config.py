@@ -7,7 +7,11 @@ for multimodal planning tasks.
 
 # Model selection for multimodal planning
 # Options: "gpt4o", "deepseek", "qwen", "claude"
-MULTIMODAL_MODEL = "qwen"  # Default to Qwen
+MULTIMODAL_MODEL = "gpt4o"  # Default to Qwen
+
+# Flag to disable images in multimodal requests (for text-only experiments)
+# Set to True to run experiments without sending images to the model
+DISABLE_IMAGES = False
 
 # DeepSeek specific configuration
 DEEPSEEK_CONFIG = {
@@ -97,11 +101,32 @@ def is_gpt4o_enabled():
 def is_claude_enabled():
     """
     Check if Claude is currently enabled.
-    
+
     Returns:
         bool: True if Claude is enabled, False otherwise
     """
     return MULTIMODAL_MODEL == "claude"
+
+def are_images_disabled():
+    """
+    Check if images are disabled for multimodal requests.
+
+    Returns:
+        bool: True if images are disabled, False otherwise
+    """
+    return DISABLE_IMAGES
+
+def set_disable_images(disable):
+    """
+    Enable or disable images in multimodal requests.
+
+    Args:
+        disable (bool): True to disable images, False to enable them
+    """
+    global DISABLE_IMAGES
+    DISABLE_IMAGES = disable
+    status = "DISABLED" if disable else "ENABLED"
+    print(f"🔵 [MODEL_CONFIG] Images are now {status} for multimodal requests")
 
 # Example usage
 if __name__ == "__main__":
